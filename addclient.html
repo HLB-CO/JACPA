@@ -485,11 +485,10 @@
 
     // تسجيل الخروج - ضع هنا منطق تسجيل الخروج الخاص بك
 function logout() {
+  localStorage.clear(); // حذف كل بيانات التخزين المحلي
   window.location.href = "https://hlb-co.github.io/JACPA/";
 }
-      // مثال: إعادة التوجيه لصفحة تسجيل الدخول
-      // window.location.href = "login.html";
-    }
+
 
     // إبراز الرابط النشط في الهيدر
     function highlightActiveLink() {
