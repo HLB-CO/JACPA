@@ -95,24 +95,28 @@
       }
     };
 
-    function login() {
-      const emailInput = document.getElementById("email").value.trim().toLowerCase();
-      const passwordInput = document.getElementById("password").value.trim();
-      const errorMsg = document.getElementById("error-msg");
+function login() {
+  const emailInput = document.getElementById("email").value.trim().toLowerCase();
+  const passwordInput = document.getElementById("password").value.trim();
+  const errorMsg = document.getElementById("error-msg");
 
-      if (!users[emailInput]) {
-        errorMsg.textContent = "البريد الإلكتروني غير موجود.";
-        return;
-      }
+  if (!users[emailInput]) {
+    errorMsg.textContent = "البريد الإلكتروني غير موجود.";
+    return;
+  }
 
-      if (users[emailInput].password !== passwordInput) {
-        errorMsg.textContent = "كلمة المرور غير صحيحة.";
-        return;
-      }
+  if (users[emailInput].password !== passwordInput) {
+    errorMsg.textContent = "كلمة المرور غير صحيحة.";
+    return;
+  }
 
-      localStorage.setItem("loggedInUser", emailInput);
-      window.location.href = users[emailInput].redirect;
-    }
+  // هنا تستبدل السطر الموجود بالسطر الجديد:
+  // localStorage.setItem("loggedInUser", emailInput);
+  localStorage.setItem("user", JSON.stringify({ email: emailInput }));
+
+  window.location.href = users[emailInput].redirect;
+}
+
   </script>
 </body>
 </html>
