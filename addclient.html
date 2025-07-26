@@ -352,123 +352,131 @@
   </div>
 
   <script>
-    const formSVGIcon = `
-      <svg class="formIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" >
-        <path d="M6 2h9l5 5v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM15 3.5V8h4.5L15 3.5zM8 11h8v2H8v-2zm0 4h8v2H8v-2z"/>
-      </svg>
+// تعريف المتغيرات DOM
+const inputGroup = document.getElementById("inputGroup");
+const formsGrid = document.getElementById("formsGrid");
+const selectedClientNameDiv = document.getElementById("selectedClientName");
+const changeClientBtn = document.getElementById("changeClientBtn");
+const clientNameInput = document.getElementById("clientName");
+const clientIdInput = document.getElementById("clientId");
+const formFrame = document.getElementById("formFrame");
+const userInfoSpan = document.getElementById("user-info");
+
+// أيقونة SVG للنماذج
+const formSVGIcon = `
+  <svg class="formIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" >
+    <path d="M6 2h9l5 5v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM15 3.5V8h4.5L15 3.5zM8 11h8v2H8v-2zm0 4h8v2H8v-2z"/>
+  </svg>
+`;
+
+// مصفوفة النماذج (نفس الموجودة في الـ HTML)
+const forms = [
+  { formId: "A.1", url: "https://tally.so/r/nWgYee", title: "نموذج قبول عميل جديد / استمرار" },
+  { formId: "A.2", url: "https://tally.so/r/3x6VZd", title: "نموذج تثبيت الاستقلالية" },
+  { formId: "A.3", url: "https://tally.so/r/wAQr8y", title: "كتاب التعيين" },
+  { formId: "A.4", url: "https://tally.so/r/wMG15l", title: "نبذة عن العميل ونشاطه" },
+  { formId: "A.5", url: "https://tally.so/r/wox9ZM", title: "مذكرة تخطيط التدقيق" },
+  { formId: "A.6", url: "https://tally.so/r/w8ENWA", title: "الأهمية النسبية" },
+  { formId: "A.7", url: "https://tally.so/r/wgOLJd", title: "فحص إجراءات الرقابة" },
+  { formId: "A.8", url: "https://tally.so/r/3y7xAd", title: "كتاب الملاحظات على الضبط الداخلي" },
+  { formId: "B.1", url: "https://tally.so/r/wdRlGV", title: "نموذج كتاب النواقص" },
+  { formId: "B.2", url: "https://tally.so/r/mYqrBv", title: "البيانات المالية النهائية" },
+  { formId: "B.3", url: "https://tally.so/r/mDW5OE", title: "مسودة البيانات المالية" },
+  { formId: "B.4", url: "https://tally.so/r/3l4L2X", title: "مسودة البيانات المالية المربطة" },
+  { formId: "B.5", url: "https://tally.so/r/mRrReQ", title: "تربيط ميزان المراجعة" },
+  { formId: "B.6", url: "https://tally.so/r/woxoNN", title: "ميزان المراجعة النهائي" },
+  { formId: "B.7", url: "https://tally.so/r/3qNO8O", title: "محاضر اجتماعات مجلس الإدارة" },
+  { formId: "B.8", url: "https://tally.so/r/n0ALq9", title: "ملخص القضايا وكتاب المستشار القانوني" },
+  { formId: "B.9", url: "https://tally.so/r/3l4L8o", title: "الوضع الضريبي وكشف الضريبة" },
+  { formId: "B.10", url: "https://tally.so/r/wal0MX", title: "نموذج الأحداث اللاحقة" },
+  { formId: "B.11", url: "https://tally.so/r/meoLJl", title: "نموذج الاستمرارية" },
+  { formId: "B.12", url: "https://tally.so/r/wvW4kD", title: "كتاب التمثيل" },
+  { formId: "B.13", url: "https://tally.so/r/wgOL24", title: "نموذج الإفصاحات للمعايير" },
+  { formId: "B.14", url: "https://tally.so/r/nrqV7R", title: "نموذج المعاملات مع الأطراف" },
+  { formId: "B.15", url: "https://tally.so/r/wal07B", title: "كتاب ومتطلبات الإقفال" },
+  { formId: "B.16", url: "https://tally.so/r/mVxV2g", title: "تحديث ملف التدقيق الدائم" },
+  { formId: "C.1", url: "https://tally.so/r/w4GN1B", title: "قائمة المركز المالي" },
+  { formId: "C.2", url: "https://tally.so/r/3qNEYd", title: "قائمة الدخل الشامل" },
+  { formId: "C.10", url: "https://tally.so/r/wQEBxA", title: "النقد وما في حكمه" },
+  { formId: "C.20", url: "https://tally.so/r/3y7q0p", title: "الذمم التجارية المدينة" },
+  { formId: "C.30", url: "https://tally.so/r/w8EpJY", title: "الاستثمارات" },
+  { formId: "C.40", url: "https://tally.so/r/w5OqlP", title: "المخزون" },
+  { formId: "C.50", url: "https://tally.so/r/wdR2Zy", title: "أرصدة مدينة أخرى" },
+  { formId: "C.60", url: "https://tally.so/r/mYqzo6", title: "الممتلكات والآلات والمعدات" },
+  { formId: "C.70", url: "https://tally.so/r/mZQRPa", title: "الأعباء المؤجلة والموجودات غير الملموسة" },
+  { formId: "C.80", url: "https://tally.so/r/3y700B", title: "الموجودات الأخرى غير المتداولة" },
+  { formId: "C.90", url: "https://tally.so/r/n0AbbN", title: "نموذج الأطراف ذات العلاقة" },
+  { formId: "C.100", url: "https://tally.so/r/3l40VB", title: "الديون المتداولة" },
+  { formId: "C.110", url: "https://tally.so/r/mRrZ8d", title: "الذمم التجارية الدائنة" },
+  { formId: "C.120", url: "https://tally.so/r/wox0le", title: "أرصدة دائنة أخرى" },
+  { formId: "C.130", url: "https://tally.so/r/mOVj87", title: "نموذج المطلوبات غير المتداولة" },
+  { formId: "C.140", url: "https://tally.so/r/mZQGPy", title: "نموذج الالتزامات والتعاقدات الطارئة" },
+  { formId: "C.150", url: "https://tally.so/r/wvW0qQ", title: "حقوق الملكية" },
+  { formId: "C.160", url: "https://tally.so/r/wMGrvX", title: "فحص المبيعات وإيرادات التشغيل" },
+  { formId: "C.170", url: "https://tally.so/r/3l40KW", title: "فحص التكاليف المباشرة" },
+  { formId: "C.180", url: "https://tally.so/r/3NO4MQ", title: "فحص المصروفات العمومية والإدارية" },
+  { formId: "C.190", url: "https://tally.so/r/wkr0KM", title: "مصاريف البيع والتوزيع" },
+  { formId: "C.200", url: "https://tally.so/r/wvW0EQ", title: "الإيرادات الأخرى" },
+  { formId: "C.210", url: "https://tally.so/r/wLoEa1", title: "الخسائر الأخرى" },
+  { formId: "C.220", url: "https://tally.so/r/3y70o4", title: "فحص أرباح وخسائر الاستثمارات" },
+  { formId: "C.230", url: "https://tally.so/r/nrq0Jv", title: "فحص تكاليف التمويل" },
+  { formId: "C.240", url: "https://tally.so/r/mOVjbK", title: "فحص الضرائب والضرائب المؤجلة" }
+];
+
+// المتغير لحفظ الفهرس المحدد
+let selectedFormIndex = null;
+
+// دالة إنشاء بطاقات النماذج داخل sidebar
+function createFormCards() {
+  formsGrid.innerHTML = ""; // تفريغ المحتوى القديم
+  forms.forEach((form, index) => {
+    const card = document.createElement("div");
+    card.className = "formCard";
+    card.dataset.index = index;
+    card.innerHTML = `
+      ${formSVGIcon}
+      <span class="formId">${form.formId}</span>
+      <span class="formTitle">${form.title}</span>
     `;
+    card.addEventListener("click", () => {
+      selectForm(index);
+    });
+    formsGrid.appendChild(card);
+  });
+}
 
-  const forms = [
-    { formId: "A.1", url: "https://tally.so/r/nWgYee", title: "نموذج قبول عميل جديد / استمرار" },
-    { formId: "A.2", url: "https://tally.so/r/3x6VZd", title: "نموذج تثبيت الاستقلالية" },
-    { formId: "A.3", url: "https://tally.so/r/wAQr8y", title: "كتاب التعيين" },
-    { formId: "A.4", url: "https://tally.so/r/wMG15l", title: "نبذة عن العميل ونشاطه" },
-    { formId: "A.5", url: "https://tally.so/r/wox9ZM", title: "مذكرة تخطيط التدقيق" },
-    { formId: "A.6", url: "https://tally.so/r/w8ENWA", title: "الأهمية النسبية" },
-    { formId: "A.7", url: "https://tally.so/r/wgOLJd", title: "فحص إجراءات الرقابة" },
-    { formId: "A.8", url: "https://tally.so/r/3y7xAd", title: "كتاب الملاحظات على الضبط الداخلي" },
-    { formId: "B.1", url: "https://tally.so/r/wdRlGV", title: "نموذج كتاب النواقص" },
-    { formId: "B.2", url: "https://tally.so/r/mYqrBv", title: "البيانات المالية النهائية" },
-    { formId: "B.3", url: "https://tally.so/r/mDW5OE", title: "مسودة البيانات المالية" },
-    { formId: "B.4", url: "https://tally.so/r/3l4L2X", title: "مسودة البيانات المالية المربطة" },
-    { formId: "B.5", url: "https://tally.so/r/mRrReQ", title: "تربيط ميزان المراجعة" },
-    { formId: "B.6", url: "https://tally.so/r/woxoNN", title: "ميزان المراجعة النهائي" },
-    { formId: "B.7", url: "https://tally.so/r/3qNO8O", title: "محاضر اجتماعات مجلس الإدارة" },
-    { formId: "B.8", url: "https://tally.so/r/n0ALq9", title: "ملخص القضايا وكتاب المستشار القانوني" },
-    { formId: "B.9", url: "https://tally.so/r/3l4L8o", title: "الوضع الضريبي وكشف الضريبة" },
-    { formId: "B.10", url: "https://tally.so/r/wal0MX", title: "نموذج الأحداث اللاحقة" },
-    { formId: "B.11", url: "https://tally.so/r/meoLJl", title: "نموذج الاستمرارية" },
-    { formId: "B.12", url: "https://tally.so/r/wvW4kD", title: "كتاب التمثيل" },
-    { formId: "B.13", url: "https://tally.so/r/wgOL24", title: "نموذج الإفصاحات للمعايير" },
-    { formId: "B.14", url: "https://tally.so/r/nrqV7R", title: "نموذج المعاملات مع الأطراف" },
-    { formId: "B.15", url: "https://tally.so/r/wal07B", title: "كتاب ومتطلبات الإقفال" },
-    { formId: "B.16", url: "https://tally.so/r/mVxV2g", title: "تحديث ملف التدقيق الدائم" },
-    { formId: "C.1", url: "https://tally.so/r/w4GN1B", title: "قائمة المركز المالي" },
-    { formId: "C.2", url: "https://tally.so/r/3qNEYd", title: "قائمة الدخل الشامل" },
-    { formId: "C.10", url: "https://tally.so/r/wQEBxA", title: "النقد وما في حكمه" },
-    { formId: "C.20", url: "https://tally.so/r/3y7q0p", title: "الذمم التجارية المدينة" },
-    { formId: "C.30", url: "https://tally.so/r/w8EpJY", title: "الاستثمارات" },
-    { formId: "C.40", url: "https://tally.so/r/w5OqlP", title: "المخزون" },
-    { formId: "C.50", url: "https://tally.so/r/wdR2Zy", title: "أرصدة مدينة أخرى" },
-    { formId: "C.60", url: "https://tally.so/r/mYqzo6", title: "الممتلكات والآلات والمعدات" },
-    { formId: "C.70", url: "https://tally.so/r/mZQRPa", title: "الأعباء المؤجلة والموجودات غير الملموسة" },
-    { formId: "C.80", url: "https://tally.so/r/3y700B", title: "الموجودات الأخرى غير المتداولة" },
-    { formId: "C.90", url: "https://tally.so/r/n0AbbN", title: "نموذج الأطراف ذات العلاقة" },
-    { formId: "C.100", url: "https://tally.so/r/3l40VB", title: "الديون المتداولة" },
-    { formId: "C.110", url: "https://tally.so/r/mRrZ8d", title: "الذمم التجارية الدائنة" },
-    { formId: "C.120", url: "https://tally.so/r/wox0le", title: "أرصدة دائنة أخرى" },
-    { formId: "C.130", url: "https://tally.so/r/mOVj87", title: "نموذج المطلوبات غير المتداولة" },
-    { formId: "C.140", url: "https://tally.so/r/mZQGPy", title: "نموذج الالتزامات والتعاقدات الطارئة" },
-    { formId: "C.150", url: "https://tally.so/r/wvW0qQ", title: "حقوق الملكية" },
-    { formId: "C.160", url: "https://tally.so/r/wMGrvX", title: "فحص المبيعات وإيرادات التشغيل" },
-    { formId: "C.170", url: "https://tally.so/r/3l40KW", title: "فحص التكاليف المباشرة" },
-    { formId: "C.180", url: "https://tally.so/r/3NO4MQ", title: "فحص المصروفات العمومية والإدارية" },
-    { formId: "C.190", url: "https://tally.so/r/wkr0KM", title: "مصاريف البيع والتوزيع" },
-    { formId: "C.200", url: "https://tally.so/r/wvW0EQ", title: "الإيرادات الأخرى" },
-    { formId: "C.210", url: "https://tally.so/r/wLoEa1", title: "الخسائر الأخرى" },
-    { formId: "C.220", url: "https://tally.so/r/3y70o4", title: "فحص أرباح وخسائر الاستثمارات" },
-    { formId: "C.230", url: "https://tally.so/r/nrq0Jv", title: "فحص تكاليف التمويل" },
-    { formId: "C.240", url: "https://tally.so/r/mOVjbK", title: "فحص الضرائب والضرائب المؤجلة" }
-  ];
-
-    let selectedFormIndex = null;
-
-    const formsGrid = document.getElementById("formsGrid");
-    const formFrame = document.getElementById("formFrame");
-    const selectedClientNameDiv = document.getElementById("selectedClientName");
-    const inputGroup = document.getElementById("inputGroup");
-    const clientNameInput = document.getElementById("clientName");
-    const changeClientBtn = document.getElementById("changeClientBtn");
-
-    // إنشاء بطاقات النماذج داخل ال sidebar
-    function createFormCards() {
-      formsGrid.innerHTML = "";
-      forms.forEach((form, index) => {
-        const card = document.createElement("div");
-        card.className = "formCard";
-        card.dataset.index = index;
-        card.innerHTML = `
-          ${formSVGIcon}
-          <span class="formId">${form.formId}</span>
-          <span class="formTitle">${form.title}</span>
-        `;
-        card.addEventListener("click", () => {
-          selectForm(index);
-        });
-        formsGrid.appendChild(card);
-      });
-    }
-
-    // تحديد نموذج معين وفتحه في iframe
+// دالة اختيار نموذج وفتحه في iframe
 function selectForm(index) {
-  const clientIdInput = document.getElementById("clientId");
-  const clientNameInput = document.getElementById("clientName");
-
-  if (!clientIdInput || !clientNameInput) {
-    alert("Client fields not found.");
-    return;
-  }
-localStorage.setItem("clientName", clientName);
-  localStorage.setItem("clientId", clientId);
   const clientId = clientIdInput.value.trim();
   const clientName = clientNameInput.value.trim();
+
+  if (!clientId || !clientName) {
+    alert("يرجى إدخال اسم العميل ورقم العميل أولاً.");
+    return;
+  }
+
+  localStorage.setItem("clientName", clientName);
+  localStorage.setItem("clientId", clientId);
 
   const url = `${forms[index].url}?client=${encodeURIComponent(clientName)}&id=${encodeURIComponent(clientId)}`;
   formFrame.src = url;
   formFrame.style.display = "block";
 
-  const formCards = document.querySelectorAll(".form-card");
-  formCards.forEach((card) => card.classList.remove("active"));
-  formCards[index].classList.add("active");
+  // تحديث اختيار البطاقة النشطة بصرياً
+  const formCards = document.querySelectorAll(".formCard");
+  formCards.forEach(card => card.classList.remove("selected"));
+  formCards[index].classList.add("selected");
+
+  selectedFormIndex = index;
 }
 
-    // عرض النماذج عند الضغط على زر "Add Client"
+// عرض النماذج بعد الضغط على زر "Add Client"
 function showForms() {
-  const clientId = document.getElementById("clientId").value.trim();
-  const clientName = document.getElementById("clientName").value.trim();
+  const clientId = clientIdInput.value.trim();
+  const clientName = clientNameInput.value.trim();
 
   if (!clientName || !clientId) {
-    alert("Please enter both Client Name and Client Number");
+    alert("يرجى إدخال اسم العميل ورقم العميل.");
     return;
   }
 
@@ -478,99 +486,89 @@ function showForms() {
   inputGroup.style.display = "none";
   formsGrid.style.display = "block";
   selectedClientNameDiv.style.display = "block";
-  selectedClientNameDiv.textContent = `Client: ${clientName} (Number: ${clientId})`;
+  selectedClientNameDiv.textContent = `العميل: ${clientName} (الرقم: ${clientId})`;
   changeClientBtn.style.display = "inline-block";
 
   createFormCards();
   formFrame.style.display = "none";
+
+  selectedFormIndex = null;
 }
 
+// إعادة تعيين العميل لتغيير بياناته
+function changeClient() {
+  clientNameInput.value = "";
+  clientIdInput.value = "";
+  inputGroup.style.display = "flex";
+  formsGrid.style.display = "none";
+  formFrame.style.display = "none";
+  selectedClientNameDiv.style.display = "none";
+  changeClientBtn.style.display = "none";
 
-    // تغيير العميل للعودة إلى شاشة الإدخال
-    function changeClient() {
-      clientNameInput.value = "";
-      inputGroup.style.display = "flex";
-      formsGrid.style.display = "none";
-      formFrame.style.display = "none";
-      selectedClientNameDiv.style.display = "none";
-      changeClientBtn.style.display = "none";
-      selectedFormIndex = null;
-    }
+  selectedFormIndex = null;
+  localStorage.removeItem("clientName");
+  localStorage.removeItem("clientId");
+}
 
-    // تسجيل الخروج - ضع هنا منطق تسجيل الخروج الخاص بك
+// تسجيل الخروج
 function logout() {
-  localStorage.clear(); // حذف كل بيانات التخزين المحلي
+  localStorage.clear();
   window.location.href = "https://hlb-co.github.io/JACPA/";
 }
 
+// تفعيل الروابط النشطة في الهيدر
+function highlightActiveLink() {
+  const current = window.location.pathname.split("/").pop();
+  const addClientLink = document.getElementById("addClientLink");
+  const clientListLink = document.getElementById("clientListLink");
 
-    // إبراز الرابط النشط في الهيدر
-    function highlightActiveLink() {
-      const current = window.location.pathname.split("/").pop();
-      const addClientLink = document.getElementById("addClientLink");
-      const clientListLink = document.getElementById("clientListLink");
+  if (current === "addclient.html") {
+    addClientLink.classList.add("active");
+    clientListLink.classList.remove("active");
+  } else if (current === "clientlist.html") {
+    clientListLink.classList.add("active");
+    addClientLink.classList.remove("active");
+  }
+}
 
-      if (current === "addclient.html") {
-        addClientLink.classList.add("active");
-        clientListLink.classList.remove("active");
-      } else if (current === "clientlist.html") {
-        clientListLink.classList.add("active");
-        addClientLink.classList.remove("active");
-      }
-    }
-
-    // دعم قائمة الدعم (WhatsApp & Email)
-    const settingsBtn = document.getElementById("settingsBtn");
-    const supportDropdown = document.getElementById("supportDropdown");
-    settingsBtn.addEventListener("click", () => {
-      if (supportDropdown.style.display === "block") {
-        supportDropdown.style.display = "none";
-      } else {
-        supportDropdown.style.display = "block";
-      }
-    });
-
-    // إخفاء قائمة الدعم عند النقر في أي مكان خارجها
-    document.addEventListener("click", (e) => {
-      if (!settingsBtn.contains(e.target) && !supportDropdown.contains(e.target)) {
-        supportDropdown.style.display = "none";
-      }
-    });
-
-    // تعيين اسم المستخدم (مثال)
+// تعيين اسم المستخدم من التخزين المحلي (مثال)
 function setUserInfo() {
-  const userInfoSpan = document.getElementById("user-info");
   const storedUser = localStorage.getItem("user");
-
   if (storedUser) {
     const user = JSON.parse(storedUser);
-    const name = user.email.split("@")[0]; // استخراج الاسم من الإيميل
+    const name = user.email.split("@")[0];
     userInfoSpan.textContent = name;
   } else {
     userInfoSpan.textContent = "";
   }
 }
 
-
-
-    // تهيئة الصفحة
-    function init() {
-      highlightActiveLink();
-      setUserInfo();
-      changeClient(); // إظهار شاشة الإدخال كبداية
-    }
-
+// تهيئة الصفحة عند تحميلها
 function init() {
+  highlightActiveLink();
+  setUserInfo();
+
   const storedName = localStorage.getItem("clientName");
   const storedId = localStorage.getItem("clientId");
 
   if (storedName && storedId) {
-    document.getElementById("clientName").value = storedName;
-    document.getElementById("clientId").value = storedId;
-  }
+    clientNameInput.value = storedName;
+    clientIdInput.value = storedId;
 
-  // ... باقي كود init إذا كان فيه شيء
+    inputGroup.style.display = "none";
+    formsGrid.style.display = "block";
+    selectedClientNameDiv.style.display = "block";
+    selectedClientNameDiv.textContent = `العميل: ${storedName} (الرقم: ${storedId})`;
+    changeClientBtn.style.display = "inline-block";
+
+    createFormCards();
+  } else {
+    changeClient();
+  }
 }
+
+document.addEventListener("DOMContentLoaded", init);
+
   </script>
 </body>
 </html>
