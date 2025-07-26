@@ -526,21 +526,17 @@ function logout() {
     // تعيين اسم المستخدم (مثال)
 function setUserInfo() {
   const userInfoSpan = document.getElementById("user-info");
-
-  // نحاول جلب المستخدم من التخزين المحلي
   const storedUser = localStorage.getItem("user");
 
   if (storedUser) {
     const user = JSON.parse(storedUser);
-    const email = user.email;
-
-    // استخراج الاسم من البريد الإلكتروني
-    const name = email.split("@")[0];
+    const name = user.email.split("@")[0]; // استخراج الاسم من الإيميل
     userInfoSpan.textContent = name;
   } else {
-    userInfoSpan.textContent = "غير مسجل";
+    userInfoSpan.textContent = "زائر";
   }
 }
+
 
 
     // تهيئة الصفحة
