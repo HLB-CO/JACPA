@@ -325,7 +325,8 @@
   <h2>Enter Client Name to View Forms</h2>
 
   <div class="input-group" id="inputGroup">
-    <input type="text" id="clientName" placeholder="Client Name" autocomplete="off" />
+<input type="text" id="clientId" placeholder="Client Number" autocomplete="off" style="width: 40%;" />
+<input type="text" id="clientName" placeholder="Client Name" autocomplete="off" style="width: 60%;" />
     <button id="addClientBtn" onclick="showForms()">Add Client</button>
   </div>
 
@@ -439,38 +440,47 @@
     }
 
     // تحديد نموذج معين وفتحه في iframe
-    function selectForm(index) {
-      if (selectedFormIndex !== null) {
-        // إزالة تحديد من النموذج القديم
-        const oldCard = formsGrid.querySelector(`.formCard[data-index="${selectedFormIndex}"]`);
-        if (oldCard) oldCard.classList.remove("selected");
-      }
-      selectedFormIndex = index;
-      const newCard = formsGrid.querySelector(`.formCard[data-index="${index}"]`);
-      if (newCard) newCard.classList.add("selected");
+function selectForm(index) {
+  const clientIdInput = document.getElementById("clientId");
+  const clientNameInput = document.getElementById("clientName");
 
-      const url = forms[index].url + `?client=${encodeURIComponent(clientNameInput.value.trim())}`;
-      formFrame.src = url;
-      formFrame.style.display = "block";
-    }
+  if (!clientIdInput || !clientNameInput) {
+    alert("Client fields not found.");
+    return;
+  }
+localStorage.setItem("clientName", clientName);
+  localStorage.setItem("clientId", clientId);
+  const clientId = clientIdInput.value.trim();
+  const clientName = clientNameInput.value.trim();
+
+  const url = `${forms[index].url}?client=${encodeURIComponent(clientName)}&id=${encodeURIComponent(clientId)}`;
+  formFrame.src = url;
+  formFrame.style.display = "block";
+
+  const formCards = document.querySelectorAll(".form-card");
+  formCards.forEach((card) => card.classList.remove("active"));
+  formCards[index].classList.add("active");
+}
 
     // عرض النماذج عند الضغط على زر "Add Client"
-    function showForms() {
-      const clientName = clientNameInput.value.trim();
-      if (!clientName) {
-        alert("يرجى إدخال اسم العميل");
-        return;
-      }
+function showForms() {
+  const clientId = document.getElementById("clientId").value.trim();
+  const clientName = document.getElementById("clientName").value.trim();
 
-      inputGroup.style.display = "none";
-      formsGrid.style.display = "block";
-      selectedClientNameDiv.style.display = "block";
-      selectedClientNameDiv.textContent = `العميل: ${clientName}`;
-      changeClientBtn.style.display = "inline-block";
+  if (!clientName || !clientId) {
+    alert("Please enter both Client Name and Client Number");
+    return;
+  }
 
-      createFormCards();
-      formFrame.style.display = "none"; // لا نعرض الإطار حتى يختار المستخدم نموذج
-    }
+  inputGroup.style.display = "none";
+  formsGrid.style.display = "block";
+  selectedClientNameDiv.style.display = "block";
+  selectedClientNameDiv.textContent = `Client: ${clientName} (Number: ${clientId})`;
+  changeClientBtn.style.display = "inline-block";
+
+  createFormCards();
+  formFrame.style.display = "none";
+}
 
     // تغيير العميل للعودة إلى شاشة الإدخال
     function changeClient() {
@@ -546,7 +556,17 @@ function setUserInfo() {
       changeClient(); // إظهار شاشة الإدخال كبداية
     }
 
-    window.onload = init;
+function init() {
+  const storedName = localStorage.getItem("clientName");
+  const storedId = localStorage.getItem("clientId");
+
+  if (storedName && storedId) {
+    document.getElementById("clientName").value = storedName;
+    document.getElementById("clientId").value = storedId;
+  }
+
+  // ... باقي كود init إذا كان فيه شيء
+}
   </script>
 </body>
 </html>
