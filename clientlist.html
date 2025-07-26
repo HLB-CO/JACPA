@@ -353,7 +353,6 @@
     }
   }
 </style>
-<!-- FontAwesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 <body>
@@ -470,7 +469,7 @@
         client,
         latestDate: responses.length > 0 ? responses[0].createdAt : ""
       }))
-      .filter(e => e.client.includes(filter))
+      .filter(e => e.client.toLowerCase().includes(filter.toLowerCase()))
       .sort((a,b) => new Date(b.latestDate) - new Date(a.latestDate));
 
     if(entries.length === 0){
@@ -519,6 +518,7 @@
 
       const downloadBtn = document.createElement('button');
       downloadBtn.className = 'download-pdf';
+      downloadBtn.title = "طباعة تفاصيل هذا الرد";
       downloadBtn.textContent = 'طباعة التفاصيل';
       downloadBtn.onclick = () => printClientResponse(client, resp.createdAt, resp.cleanedData);
 
@@ -544,7 +544,7 @@
 
   function printClientResponse(client, createdAt, dataObj) {
     const printWindow = window.open('', '_blank', 'width=800,height=600');
-    
+
     const formattedDate = createdAt ? new Date(createdAt).toLocaleString('ar-EG') : '-';
 
     let html = `
@@ -604,11 +604,7 @@
   const supportDropdown = document.getElementById('supportDropdown');
 
   settingsBtn.addEventListener('click', () => {
-    if(supportDropdown.style.display === 'block'){
-      supportDropdown.style.display = 'none';
-    } else {
-      supportDropdown.style.display = 'block';
-    }
+    supportDropdown.style.display = supportDropdown.style.display === 'block' ? 'none' : 'block';
   });
 
   // إخفاء القائمة عند الضغط خارجها
@@ -619,6 +615,7 @@
   });
 
   loadData();
+
   // إظهار اسم المستخدم أو إعادة التوجيه
   const user = localStorage.getItem("loggedInUser");
   if (!user) {
@@ -631,25 +628,7 @@
     localStorage.removeItem("loggedInUser");
     window.location.href = "index.html";
   }
-
-  // Toggle إعدادات الدعم
-  const settingsBtn = document.getElementById("settingsBtn");
-  const supportDropdown = document.getElementById("supportDropdown");
-
-  settingsBtn.addEventListener("click", () => {
-    supportDropdown.style.display = supportDropdown.style.display === "block" ? "none" : "block";
-  });
-
-  // إغلاق القائمة عند النقر خارجها
-  document.addEventListener("click", (e) => {
-    if (!settingsBtn.contains(e.target) && !supportDropdown.contains(e.target)) {
-      supportDropdown.style.display = "none";
-    }
-  });
-</script>
-
 </script>
 
 </body>
-
 </html>
