@@ -84,6 +84,7 @@
     .header-actions {
       display: flex;
       gap: 1rem;
+      position: relative;
     }
 
     .header-actions button {
@@ -98,32 +99,34 @@
     .header-actions button:hover {
       color: #1a237e;
     }
-.support-dropdown {
-  display: none;
-  position: absolute;
-  top: 120%;
-  left: 0;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 0.5rem 1rem;
-  width: 180px;
-  z-index: 999;
-}
 
-.support-dropdown a {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0;
-  color: #333;
-  text-decoration: none;
-}
+    .support-dropdown {
+      display: none;
+      position: absolute;
+      top: 120%;
+      left: 0;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 0.5rem 1rem;
+      width: 180px;
+      z-index: 999;
+    }
 
-.support-dropdown a:hover {
-  background-color: #f0f0f0;
-}
+    .support-dropdown a {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0;
+      color: #333;
+      text-decoration: none;
+    }
+
+    .support-dropdown a:hover {
+      background-color: #f0f0f0;
+    }
+
     h2 {
       font-size: 24px;
       font-weight: 400;
@@ -131,8 +134,7 @@
       text-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
       margin-bottom: 20px;
       text-align: center;
-        margin-top: 5rem; /* ✅ تم الإضافة */
-
+      margin-top: 5rem; /* ✅ تم الإضافة */
     }
 
     .input-group {
@@ -153,6 +155,7 @@
       transition: 0.3s;
       color: #1a1a2e;
     }
+
     input[type="text"]:focus {
       border-color: #3949ab;
       box-shadow: 0 0 8px rgba(26, 35, 126, 0.4);
@@ -169,6 +172,7 @@
       box-shadow: 0 4px 10px rgba(26, 35, 126, 0.5);
       transition: 0.3s;
     }
+
     #addClientBtn:hover {
       background: #283593;
     }
@@ -262,6 +266,7 @@
     #formsGrid::-webkit-scrollbar {
       width: 6px;
     }
+
     #formsGrid::-webkit-scrollbar-thumb {
       background: #1a237e88;
       border-radius: 6px;
@@ -281,57 +286,53 @@
       align-self: flex-start;
       transition: 0.3s;
     }
+
     #changeClientBtn:hover {
       background: #b71c1c;
     }
   </style>
 </head>
 <body>
-  
   <!-- Header/Navbar -->
-<header class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background-color: #ffffff; color: #002244; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-  <div class="logo-container">
-    <img src="https://res.cloudinary.com/dvrjapxpd/image/upload/v1753147012/M__2_-removebg-preview_wuisdm.png" alt="Logo" style="height: 40px;" />
-  </div>
-
-  <nav class="nav-links" style="display: flex; gap: 20px;">
-    <a href="addclient.html" class="nav-link" style="color: #002244; text-decoration: none; font-weight: 500;">Add Client</a>
-    <a href="clientlist.html" class="nav-link active" style="color: #002244; text-decoration: none; font-weight: 500;">Client List</a>
-  </nav>
-
-  <div class="header-actions" style="display: flex; align-items: center; gap: 15px;">
-    <span id="user-info" style="font-weight: bold;"></span>
-
-    <button onclick="logout()" style="background-color: #c00; border: none; color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer;">تسجيل الخروج</button>
-
-    <button id="settingsBtn" style="background: none; border: none; color: #002244; font-size: 18px; cursor: pointer;"><i class="fas fa-cog"></i></button>
-
-    <div class="support-dropdown" id="supportDropdown" style="display: none; position: absolute; top: 60px; right: 20px; background: #ffffff; color: #002244; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 10px;">
-      <a href="https://api.whatsapp.com/send/?phone=962788677607&text&type=phone_number&app_absent=0" target="_blank" style="display: block; margin-bottom: 8px; color: #002244; text-decoration: none;">
-        <i class="fab fa-whatsapp"></i> WhatsApp
-      </a>
-      <a href="mailto:abdulhadi.sa00@gmail.com" style="display: block; color: #002244; text-decoration: none;">
-        <i class="fas fa-envelope"></i> Email
-      </a>
+  <header class="dashboard-header">
+    <div class="logo-container">
+      <img src="https://res.cloudinary.com/dvrjapxpd/image/upload/v1753147012/M__2_-removebg-preview_wuisdm.png" alt="Logo" />
     </div>
+
+    <nav class="nav-links">
+      <a href="addclient.html" class="nav-link" id="addClientLink">Add Client</a>
+      <a href="clientlist.html" class="nav-link active" id="clientListLink">Client List</a>
+    </nav>
+
+    <div class="header-actions">
+      <span id="user-info" style="font-weight: bold;"></span>
+
+      <button onclick="logout()" style="background-color: #c00; border: none; color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer;">تسجيل الخروج</button>
+
+      <button id="settingsBtn"><i class="fas fa-cog"></i></button>
+
+      <div class="support-dropdown" id="supportDropdown">
+        <a href="https://api.whatsapp.com/send/?phone=962788677607&text&type=phone_number&app_absent=0" target="_blank">
+          <i class="fab fa-whatsapp"></i> WhatsApp
+        </a>
+        <a href="mailto:abdulhadi.sa00@gmail.com">
+          <i class="fas fa-envelope"></i> Email
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <h2>Enter Client Name to View Forms</h2>
+
+  <div class="input-group" id="inputGroup">
+    <input type="text" id="clientName" placeholder="Client Name" autocomplete="off" />
+    <button id="addClientBtn" onclick="showForms()">Add Client</button>
   </div>
-</header>
-
-
-
- <h2>Enter Client Name to View Forms</h2>
-
-<div class="input-group" id="inputGroup">
-  <input type="text" id="clientName" placeholder="Client Name" autocomplete="off" />
-  <button id="addClientBtn" onclick="showForms()">Add Client</button>
-</div>
 
   <div id="mainContainer">
-
     <div id="formsGrid"></div>
 
     <div style="flex-grow:1; display:flex; flex-direction: column; gap: 10px;">
-
       <div id="selectedClientName" style="
         font-weight: 700; 
         font-size: 20px; 
@@ -343,234 +344,192 @@
         display: none;
       "></div>
 
-<button id="changeClientBtn" onclick="changeClient()">Change Client</button>
+      <button id="changeClientBtn" onclick="changeClient()">Change Client</button>
 
       <iframe id="formFrame" src="" frameborder="0"></iframe>
     </div>
-
   </div>
 
-<script>
-  const formSVGIcon = `
-    <svg class="formIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" >
-      <path d="M6 2h9l5 5v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM15 3.5V8h4.5L15 3.5zM8 11h8v2H8v-2zm0 4h8v2H8v-2z"/>
-    </svg>
-  `;
+  <script>
+    const formSVGIcon = `
+      <svg class="formIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" >
+        <path d="M6 2h9l5 5v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM15 3.5V8h4.5L15 3.5zM8 11h8v2H8v-2zm0 4h8v2H8v-2z"/>
+      </svg>
+    `;
 
-  const forms = [
-    { formId: "A.1", url: "https://tally.so/r/nWgYee", title: "نموذج قبول عميل جديد / استمرار" },
-    { formId: "A.2", url: "https://tally.so/r/3x6VZd", title: "نموذج تثبيت الاستقلالية" },
-    { formId: "A.3", url: "https://tally.so/r/wAQr8y", title: "كتاب التعيين" },
-    { formId: "A.4", url: "https://tally.so/r/wMG15l", title: "نبذة عن العميل ونشاطه" },
-    { formId: "A.5", url: "https://tally.so/r/wox9ZM", title: "مذكرة تخطيط التدقيق" },
-    { formId: "A.6", url: "https://tally.so/r/w8ENWA", title: "الأهمية النسبية" },
-    { formId: "A.7", url: "https://tally.so/r/wgOLJd", title: "فحص إجراءات الرقابة" },
-    { formId: "A.8", url: "https://tally.so/r/3y7xAd", title: "كتاب الملاحظات على الضبط الداخلي" },
-    { formId: "B.1", url: "https://tally.so/r/wdRlGV", title: "نموذج كتاب النواقص" },
-    { formId: "B.2", url: "https://tally.so/r/mYqrBv", title: "البيانات المالية النهائية" },
-    { formId: "B.3", url: "https://tally.so/r/mDW5OE", title: "مسودة البيانات المالية" },
-    { formId: "B.4", url: "https://tally.so/r/3l4L2X", title: "مسودة البيانات المالية المربطة" },
-    { formId: "B.5", url: "https://tally.so/r/mRrReQ", title: "تربيط ميزان المراجعة" },
-    { formId: "B.6", url: "https://tally.so/r/woxoNN", title: "ميزان المراجعة النهائي" },
-    { formId: "B.7", url: "https://tally.so/r/3qNO8O", title: "محاضر اجتماعات مجلس الإدارة" },
-    { formId: "B.8", url: "https://tally.so/r/n0ALq9", title: "ملخص القضايا وكتاب المستشار القانوني" },
-    { formId: "B.9", url: "https://tally.so/r/3l4L8o", title: "الوضع الضريبي وكشف الضريبة" },
-    { formId: "B.10", url: "https://tally.so/r/wal0MX", title: "نموذج الأحداث اللاحقة" },
-    { formId: "B.11", url: "https://tally.so/r/meoLJl", title: "نموذج الاستمرارية" },
-    { formId: "B.12", url: "https://tally.so/r/wvW4kD", title: "كتاب التمثيل" },
-    { formId: "B.13", url: "https://tally.so/r/wgOL24", title: "نموذج الإفصاحات للمعايير" },
-    { formId: "B.14", url: "https://tally.so/r/nrqV7R", title: "نموذج المعاملات مع الأطراف" },
-    { formId: "B.15", url: "https://tally.so/r/wal07B", title: "كتاب ومتطلبات الإقفال" },
-    { formId: "B.16", url: "https://tally.so/r/mVxV2g", title: "تحديث ملف التدقيق الدائم" },
-    { formId: "C.1", url: "https://tally.so/r/w4GN1B", title: "قائمة المركز المالي" },
-    { formId: "C.2", url: "https://tally.so/r/3qNEYd", title: "قائمة الدخل الشامل" },
-    { formId: "C.10", url: "https://tally.so/r/wQEBxA", title: "النقد وما في حكمه" },
-    { formId: "C.20", url: "https://tally.so/r/3y7q0p", title: "الذمم التجارية المدينة" },
-    { formId: "C.30", url: "https://tally.so/r/w8EpJY", title: "الاستثمارات" },
-    { formId: "C.40", url: "https://tally.so/r/w5OqlP", title: "المخزون" },
-    { formId: "C.50", url: "https://tally.so/r/wdR2Zy", title: "أرصدة مدينة أخرى" },
-    { formId: "C.60", url: "https://tally.so/r/mYqzo6", title: "الممتلكات والآلات والمعدات" },
-    { formId: "C.70", url: "https://tally.so/r/mZQRPa", title: "الأعباء المؤجلة والموجودات غير الملموسة" },
-    { formId: "C.80", url: "https://tally.so/r/3y700B", title: "الموجودات الأخرى غير المتداولة" },
-    { formId: "C.90", url: "https://tally.so/r/n0AbbN", title: "نموذج الأطراف ذات العلاقة" },
-    { formId: "C.100", url: "https://tally.so/r/3l40VB", title: "الديون المتداولة" },
-    { formId: "C.110", url: "https://tally.so/r/mRrZ8d", title: "الذمم التجارية الدائنة" },
-    { formId: "C.120", url: "https://tally.so/r/wox0le", title: "أرصدة دائنة أخرى" },
-    { formId: "C.130", url: "https://tally.so/r/mOVj87", title: "نموذج المطلوبات غير المتداولة" },
-    { formId: "C.140", url: "https://tally.so/r/mZQGPy", title: "نموذج الالتزامات والتعاقدات الطارئة" },
-    { formId: "C.150", url: "https://tally.so/r/wvW0qQ", title: "حقوق الملكية" },
-    { formId: "C.160", url: "https://tally.so/r/wMGrvX", title: "فحص المبيعات وإيرادات التشغيل" },
-    { formId: "C.170", url: "https://tally.so/r/3l40KW", title: "فحص التكاليف المباشرة" },
-    { formId: "C.180", url: "https://tally.so/r/3NO4MQ", title: "فحص المصروفات العمومية والإدارية" },
-    { formId: "C.190", url: "https://tally.so/r/wkr0KM", title: "مصاريف البيع والتوزيع" },
-    { formId: "C.200", url: "https://tally.so/r/wvW0EQ", title: "الإيرادات الأخرى" },
-    { formId: "C.210", url: "https://tally.so/r/wLoEa1", title: "الخسائر الأخرى" },
-    { formId: "C.220", url: "https://tally.so/r/3y70o4", title: "فحص أرباح وخسائر الاستثمارات" },
-    { formId: "C.230", url: "https://tally.so/r/nrq0Jv", title: "فحص تكاليف التمويل" },
-    { formId: "C.240", url: "https://tally.so/r/mOVjbK", title: "فحص الضرائب والضرائب المؤجلة" }
-  ];
+    const forms = [
+      { formId: "A.1", url: "https://tally.so/r/nWgYee", title: "نموذج قبول عميل جديد / استمرار" },
+      { formId: "A.2", url: "https://tally.so/r/3x6VZd", title: "نموذج تثبيت الاستقلالية" },
+      { formId: "A.3", url: "https://tally.so/r/wAQr8y", title: "كتاب التعيين" },
+      { formId: "A.4", url: "https://tally.so/r/wMG15l", title: "نبذة عن العميل ونشاطه" },
+      { formId: "A.5", url: "https://tally.so/r/wox9ZM", title: "مذكرة تخطيط التدقيق" },
+      { formId: "A.6", url: "https://tally.so/r/w8ENWA", title: "الأهمية النسبية" },
+      { formId: "A.7", url: "https://tally.so/r/wgOLJd", title: "فحص إجراءات الرقابة" },
+      { formId: "A.8", url: "https://tally.so/r/3y7xAd", title: "كتاب الملاحظات على الضبط الداخلي" },
+      { formId: "B.1", url: "https://tally.so/r/wdRlGV", title: "نموذج كتاب النواقص" },
+      { formId: "B.2", url: "https://tally.so/r/mYqrBv", title: "البيانات المالية النهائية" },
+      { formId: "B.3", url: "https://tally.so/r/mDW5OE", title: "مسودة البيانات المالية" },
+      { formId: "B.4", url: "https://tally.so/r/3l4L2X", title: "مسودة البيانات المالية المربطة" },
+      { formId: "B.5", url: "https://tally.so/r/mRrReQ", title: "تربيط ميزان المراجعة" },
+      { formId: "B.6", url: "https://tally.so/r/woxoNN", title: "ميزان المراجعة النهائي" },
+      { formId: "B.7", url: "https://tally.so/r/3qNO8O", title: "محاضر اجتماعات مجلس الإدارة" },
+      { formId: "B.8", url: "https://tally.so/r/n0ALq9", title: "ملخص القضايا وكتاب المستشار القانوني" },
+      { formId: "B.9", url: "https://tally.so/r/3l4L8o", title: "الوضع الضريبي وكشف الضريبة" },
+      { formId: "B.10", url: "https://tally.so/r/wal0MX", title: "نموذج الأحداث اللاحقة" },
+      { formId: "B.11", url: "https://tally.so/r/meoLJl", title: "نموذج الاستمرارية" },
+      { formId: "B.12", url: "https://tally.so/r/wvW4kD", title: "كتاب التمثيل" },
+      { formId: "B.13", url: "https://tally.so/r/wgOL24", title: "نموذج الإفصاحات للمعايير" },
+      { formId: "B.14", url: "https://tally.so/r/nrqV7R", title: "نموذج المعاملات مع الأطراف" },
+      { formId: "B.15", url: "https://tally.so/r/wal07B", title: "كتاب ومتطلبات الإقفال" },
+      { formId: "B.16", url: "https://tally.so/r/mVxV2g", title: "تحديث ملف التدقيق الدائم" },
+      { formId: "C.1", url: "https://tally.so/r/w4GN1B", title: "قائمة المركز المالي" },
+      { formId: "C.2", url: "https://tally.so/r/3qNEYd", title: "قائمة الدخل الشامل" },
+      { formId: "C.10", url: "https://tally.so/r/wQEBxA", title: "النقد وما في حكمه" },
+      { formId: "C.20", url: "https://tally.so/r/3y7q0p", title: "الذمم التجارية المدينة" },
+      { formId: "C.30", url: "https://tally.so/r/w8EpJY", title: "الاستثمارات" },
+      { formId: "C.40", url: "https://tally.so/r/w5OqlP", title: "المخزون" },
+      { formId: "C.50", url: "https://tally.so/r/wdR2Zy", title: "أرصدة مدينة أخرى" },
+      { formId: "C.60", url: "https://tally.so/r/mYqzo6", title: "الممتلكات والآلات والمعدات" },
+      { formId: "C.70", url: "https://tally.so/r/mZQRPa", title: "الأعباء المؤجلة والموجودات غير الملموسة" },
+      { formId: "C.80", url: "https://tally.so/r/3y700B", title: "الموجودات الأخرى غير المتداولة" },
+      { formId: "C.90", url: "https://tally.so/r/n0AbbN", title: "نموذج الأطراف ذات العلاقة" },
+      { formId: "C.100", url: "https://tally.so/r/3l40VB", title: "الديون المتداولة" },
+      { formId: "C.110", url: "https://tally.so/r/mRrZ8d", title: "الذمم التجارية الدائنة" },
+      { formId: "C.120", url: "https://tally.so/r/wox0le", title: "أرصدة دائنة أخرى" },
+      { formId: "C.130", url: "https://tally.so/r/wgOKdY", title: "الاحتياطات والأعباء المستحقة" },
+      { formId: "C.140", url: "https://tally.so/r/n0ALAb", title: "الالتزامات طويلة الأجل" },
+      { formId: "C.150", url: "https://tally.so/r/wvWQdw", title: "رأس المال والاحتياطات" },
+      { formId: "C.160", url: "https://tally.so/r/3qNPNx", title: "قائمة التدفقات النقدية" }
+    ];
 
-  const container = document.getElementById("formsGrid");
-  const iframe = document.getElementById("formFrame");
-  const inputGroup = document.getElementById("inputGroup");
-  const selectedClientNameDiv = document.getElementById("selectedClientName");
-  const changeClientBtn = document.getElementById("changeClientBtn");
+    let selectedFormIndex = null;
 
-  let selectedCard = null;
-  let currentClient = null;
+    const formsGrid = document.getElementById("formsGrid");
+    const formFrame = document.getElementById("formFrame");
+    const selectedClientNameDiv = document.getElementById("selectedClientName");
+    const inputGroup = document.getElementById("inputGroup");
+    const clientNameInput = document.getElementById("clientName");
+    const changeClientBtn = document.getElementById("changeClientBtn");
 
-  function showForms() {
-    const client = document.getElementById("clientName").value.trim();
-
-    if (!client) {
-      alert("الرجاء إدخال اسم العميل");
-      return;
+    // إنشاء بطاقات النماذج داخل ال sidebar
+    function createFormCards() {
+      formsGrid.innerHTML = "";
+      forms.forEach((form, index) => {
+        const card = document.createElement("div");
+        card.className = "formCard";
+        card.dataset.index = index;
+        card.innerHTML = `
+          ${formSVGIcon}
+          <span class="formId">${form.formId}</span>
+          <span class="formTitle">${form.title}</span>
+        `;
+        card.addEventListener("click", () => {
+          selectForm(index);
+        });
+        formsGrid.appendChild(card);
+      });
     }
 
-    currentClient = client;
+    // تحديد نموذج معين وفتحه في iframe
+    function selectForm(index) {
+      if (selectedFormIndex !== null) {
+        // إزالة تحديد من النموذج القديم
+        const oldCard = formsGrid.querySelector(`.formCard[data-index="${selectedFormIndex}"]`);
+        if (oldCard) oldCard.classList.remove("selected");
+      }
+      selectedFormIndex = index;
+      const newCard = formsGrid.querySelector(`.formCard[data-index="${index}"]`);
+      if (newCard) newCard.classList.add("selected");
 
-    // إخفاء حقل الإدخال مع الزر
-    inputGroup.style.opacity = "0";
-    inputGroup.style.height = "0";
-    inputGroup.style.marginBottom = "0";
-    setTimeout(() => {
+      const url = forms[index].url + `?client=${encodeURIComponent(clientNameInput.value.trim())}`;
+      formFrame.src = url;
+      formFrame.style.display = "block";
+    }
+
+    // عرض النماذج عند الضغط على زر "Add Client"
+    function showForms() {
+      const clientName = clientNameInput.value.trim();
+      if (!clientName) {
+        alert("يرجى إدخال اسم العميل");
+        return;
+      }
+
       inputGroup.style.display = "none";
-    }, 500);
+      formsGrid.style.display = "block";
+      selectedClientNameDiv.style.display = "block";
+      selectedClientNameDiv.textContent = `العميل: ${clientName}`;
+      changeClientBtn.style.display = "inline-block";
 
-    // عرض اسم العميل فوق الفورم
-    selectedClientNameDiv.textContent = `العميل: ${client}`;
-    selectedClientNameDiv.style.display = "block";
+      createFormCards();
+      formFrame.style.display = "none"; // لا نعرض الإطار حتى يختار المستخدم نموذج
+    }
 
-    // إظهار زر تغيير العميل
-    changeClientBtn.style.display = "inline-block";
+    // تغيير العميل للعودة إلى شاشة الإدخال
+    function changeClient() {
+      clientNameInput.value = "";
+      inputGroup.style.display = "flex";
+      formsGrid.style.display = "none";
+      formFrame.style.display = "none";
+      selectedClientNameDiv.style.display = "none";
+      changeClientBtn.style.display = "none";
+      selectedFormIndex = null;
+    }
 
-    container.innerHTML = "";
-    iframe.style.display = "none";
-    iframe.src = "";
+    // تسجيل الخروج - ضع هنا منطق تسجيل الخروج الخاص بك
+    function logout() {
+      alert("تم تسجيل الخروج!");
+      // مثال: إعادة التوجيه لصفحة تسجيل الدخول
+      // window.location.href = "login.html";
+    }
 
-    selectedCard = null;
+    // إبراز الرابط النشط في الهيدر
+    function highlightActiveLink() {
+      const current = window.location.pathname.split("/").pop();
+      const addClientLink = document.getElementById("addClientLink");
+      const clientListLink = document.getElementById("clientListLink");
 
-    forms.forEach(form => {
-      const card = document.createElement("div");
-      card.className = "formCard";
-      card.title = form.title;
-      card.innerHTML = `
-        ${formSVGIcon}
-        <div class="formId">${form.formId}</div>
-        <div class="formTitle">${form.title}</div>
-      `;
+      if (current === "addclient.html") {
+        addClientLink.classList.add("active");
+        clientListLink.classList.remove("active");
+      } else if (current === "clientlist.html") {
+        clientListLink.classList.add("active");
+        addClientLink.classList.remove("active");
+      }
+    }
 
-      card.onclick = () => {
-        if (selectedCard) {
-          selectedCard.classList.remove("selected");
-        }
-        card.classList.add("selected");
-        selectedCard = card;
-
-        iframe.src = `${form.url}?client=${encodeURIComponent(currentClient)}&form_id=${encodeURIComponent(form.formId)}`;
-        iframe.style.display = "block";
-        iframe.scrollIntoView({ behavior: "smooth" });
-      };
-
-      container.appendChild(card);
-    });
-  }
-
-  function changeClient() {
-    // إخفاء الفورم والقائمة والاسم
-    iframe.style.display = "none";
-    iframe.src = "";
-    container.innerHTML = "";
-    selectedClientNameDiv.style.display = "none";
-    selectedClientNameDiv.textContent = "";
-    changeClientBtn.style.display = "none";
-
-    // إظهار حقل الإدخال مرة أخرى
-    inputGroup.style.display = "flex";
-    setTimeout(() => {
-      inputGroup.style.opacity = "1";
-      inputGroup.style.height = "";
-      inputGroup.style.marginBottom = "30px";
-    }, 50);
-
-    // إعادة تعيين الحقل
-    document.getElementById("clientName").value = "";
-    document.getElementById("clientName").focus();
-
-    currentClient = null;
-    selectedCard = null;
-  }
-  
-</script>
-
-</body>
-</html>
-  <script>
-    // تمييز الرابط الحالي في الهيدر
-    const currentPage = window.location.pathname.split('/').pop();
-    document.querySelectorAll('.nav-link').forEach(link => {
-      if (link.getAttribute('href') === currentPage) {
-        link.classList.add('active');
+    // دعم قائمة الدعم (WhatsApp & Email)
+    const settingsBtn = document.getElementById("settingsBtn");
+    const supportDropdown = document.getElementById("supportDropdown");
+    settingsBtn.addEventListener("click", () => {
+      if (supportDropdown.style.display === "block") {
+        supportDropdown.style.display = "none";
+      } else {
+        supportDropdown.style.display = "block";
       }
     });
-  const settingsBtn = document.getElementById("settingsBtn");
-  const supportDropdown = document.getElementById("supportDropdown");
 
-  settingsBtn.addEventListener("click", () => {
-    supportDropdown.style.display =
-      supportDropdown.style.display === "block" ? "none" : "block";
-  });
+    // إخفاء قائمة الدعم عند النقر في أي مكان خارجها
+    document.addEventListener("click", (e) => {
+      if (!settingsBtn.contains(e.target) && !supportDropdown.contains(e.target)) {
+        supportDropdown.style.display = "none";
+      }
+    });
 
-  // Close dropdown when clicking outside
-  window.addEventListener("click", function (e) {
-    if (!settingsBtn.contains(e.target) && !supportDropdown.contains(e.target)) {
-      supportDropdown.style.display = "none";
+    // تعيين اسم المستخدم (مثال)
+    function setUserInfo() {
+      const userInfoSpan = document.getElementById("user-info");
+      // هنا يمكنك جلب اسم المستخدم فعلياً من التخزين المحلي أو API
+      userInfoSpan.textContent = "MSINDAHA"; // مثال اسم المستخدم
     }
-  });
 
-  // Activate the current page
-  const current = window.location.pathname;
-  if (current.includes("addclient.html")) {
-    document.getElementById("addClientLink").classList.add("active");
-  } else if (current.includes("clientlist.html")) {
-    document.getElementById("clientListLink").classList.add("active");
-  }
-    const currentPage = window.location.pathname.split('/').pop();
-  const navLinks = document.querySelectorAll('.nav-link');
-
-  navLinks.forEach(link => {
-    const href = link.getAttribute('href');
-    if(href === currentPage){
-      link.classList.add('active');
+    // تهيئة الصفحة
+    function init() {
+      highlightActiveLink();
+      setUserInfo();
+      changeClient(); // إظهار شاشة الإدخال كبداية
     }
-  });
-  // إظهار اسم المستخدم أو إعادة التوجيه
-  const user = localStorage.getItem("loggedInUser");
-  if (!user) {
-    window.location.href = "index.html"; // غيّر المسار إذا لزم
-  } else {
-    document.getElementById("user-info").textContent = "مرحبًا، " + user.split("@")[0];
-  }
 
-  function logout() {
-    localStorage.removeItem("loggedInUser");
-    window.location.href = "index.html";
-  }
-
-  // Toggle إعدادات الدعم
-  const settingsBtn = document.getElementById("settingsBtn");
-  const supportDropdown = document.getElementById("supportDropdown");
-
-  settingsBtn.addEventListener("click", () => {
-    supportDropdown.style.display = supportDropdown.style.display === "block" ? "none" : "block";
-  });
-
-  // إغلاق القائمة عند النقر خارجها
-  document.addEventListener("click", (e) => {
-    if (!settingsBtn.contains(e.target) && !supportDropdown.contains(e.target)) {
-      supportDropdown.style.display = "none";
-    }
-  });
+    window.onload = init;
   </script>
 </body>
 </html>
