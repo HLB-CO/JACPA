@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>إضافة عميل</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #fff, #fff);
+      color: #1a1a2e;
+      direction: rtl;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+    }
+
+    /* Header/Navbar Styles */
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #fff;
+      padding: 2px 6px;
+      border-bottom: 1px solid #ddd;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      font-family: 'Poppins', sans-serif;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      width: 100%;
+      max-width: 1300px;
+    }
+
+    .logo-container img {
+      height: 50px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .nav-link {
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      position: relative;
+      transition: color 0.3s;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0%;
+      height: 2px;
+      background-color: #1a237e;
+      right: 0;
+      bottom: -4px;
+      transition: width 0.3s;
+    }
+
+    .nav-link:hover::after {
+      width: 100%;
+    }
+
+    .nav-link:hover {
+      color: #1a237e;
+    }
+
+    .nav-link.active {
+      color: #1a237e;
+    }
+
+    .nav-link.active::after {
+      width: 100%;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .header-actions button {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: #444;
+      transition: color 0.2s;
+    }
+
+    .header-actions button:hover {
+      color: #1a237e;
+    }
+.support-dropdown {
+  display: none;
+  position: absolute;
+  top: 120%;
+  left: 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 1rem;
+  width: 180px;
+  z-index: 999;
+}
+
+.support-dropdown a {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  color: #333;
+  text-decoration: none;
+}
+
+.support-dropdown a:hover {
+  background-color: #f0f0f0;
+}
+    h2 {
+      font-size: 24px;
+      font-weight: 400;
+      color: #1a237e;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+      margin-bottom: 20px;
+      text-align: center;
+        margin-top: 5rem; /* ✅ تم الإضافة */
+
+    }
+
+    .input-group {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 12px 16px;
+      font-size: 16px;
+      border: 2px solid #1a237e;
+      border-radius: 10px;
+      outline: none;
+      transition: 0.3s;
+      color: #1a1a2e;
+    }
+    input[type="text"]:focus {
+      border-color: #3949ab;
+      box-shadow: 0 0 8px rgba(26, 35, 126, 0.4);
+    }
+
+    #addClientBtn {
+      background: #1a237e;
+      color: #fff;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(26, 35, 126, 0.5);
+      transition: 0.3s;
+    }
+    #addClientBtn:hover {
+      background: #283593;
+    }
+
+    #mainContainer {
+      display: flex;
+      width: 100%;
+      max-width: 1300px;
+      height: 850px;
+      gap: 20px;
+    }
+
+    #formsGrid {
+      width: 250px;
+      background: #fff;
+      border-radius: 20px;
+      padding: 15px;
+      overflow-y: auto;
+      box-shadow: 0 6px 20px rgba(26, 35, 126, 0.15);
+    }
+
+    .formCard {
+      border-radius: 10px;
+      padding: 8px;
+      margin-bottom: 8px;
+      text-align: center;
+      cursor: pointer;
+      background: #f5f7ff;
+      box-shadow: 0 2px 6px rgba(26, 35, 126, 0.1);
+      transition: 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .formCard:hover {
+      background: #e0e7ff;
+      transform: translateY(-2px);
+    }
+
+    .formCard.selected {
+      background: linear-gradient(135deg, #1a237e, #3949ab);
+      color: white;
+      box-shadow: 0 6px 18px rgba(26, 35, 126, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .formCard.selected .formId,
+    .formCard.selected .formTitle {
+      color: white !important;
+    }
+
+    .formIcon {
+      width: 26px;
+      height: 40px;
+      fill: #1a237e;
+      transition: 0.3s;
+    }
+
+    .formCard.selected .formIcon {
+      fill: white !important;
+      filter: drop-shadow(0 2px 3px rgba(255,255,255,0.8));
+    }
+
+    .formId {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1a237e;
+    }
+
+    .formTitle {
+      font-size: 13px;
+      font-weight: 500;
+      color: #444;
+      line-height: 1.2;
+      word-break: break-word;
+    }
+
+    iframe#formFrame {
+      flex: 1;
+      border: none;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(26, 35, 126, 0.2);
+      background: white;
+      height: 100%;
+      display: none;
+      transition: 0.4s;
+    }
+
+    #formsGrid::-webkit-scrollbar {
+      width: 6px;
+    }
+    #formsGrid::-webkit-scrollbar-thumb {
+      background: #1a237e88;
+      border-radius: 6px;
+    }
+
+    #changeClientBtn {
+      margin-top: 15px;
+      background: #d32f2f;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(211, 47, 47, 0.5);
+      display: none;
+      align-self: flex-start;
+      transition: 0.3s;
+    }
+    #changeClientBtn:hover {
+      background: #b71c1c;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header/Navbar -->
+<header class="dashboard-header">
+  <div class="logo-container">
+    <img src="https://res.cloudinary.com/dvrjapxpd/image/upload/v1753147012/M__2_-removebg-preview_wuisdm.png" alt="Logo" />
+  </div>
+
+<nav class="nav-links">
+  <a href="addclient.html" class="nav-link">Add Client</a>
+  <a href="clientlist.html" class="nav-link active">Client List</a>
+</nav>
+
+
+  <div class="header-actions">
+    <button id="settingsBtn"><i class="fas fa-cog"></i></button>
+    <div class="support-dropdown" id="supportDropdown">
+      <a href="https://api.whatsapp.com/send/?phone=962788677607&text&type=phone_number&app_absent=0" target="_blank">
+        <i class="fab fa-whatsapp"></i> WhatsApp
+      </a>
+      <a href="mailto:abdulhadi.sa00@gmail.com">
+        <i class="fas fa-envelope"></i> Email
+      </a>
+    </div>
+  </div>
+</header>
+
+
+ <h2>Enter Client Name to View Forms</h2>
+
+<div class="input-group" id="inputGroup">
+  <input type="text" id="clientName" placeholder="Client Name" autocomplete="off" />
+  <button id="addClientBtn" onclick="showForms()">Add Client</button>
+</div>
+
+  <div id="mainContainer">
+
+    <div id="formsGrid"></div>
+
+    <div style="flex-grow:1; display:flex; flex-direction: column; gap: 10px;">
+
+      <div id="selectedClientName" style="
+        font-weight: 700; 
+        font-size: 20px; 
+        color: #2233ff; 
+        min-height: 28px; 
+        user-select: none;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #2233ff;
+        display: none;
+      "></div>
+
+<button id="changeClientBtn" onclick="changeClient()">Change Client</button>
+
+      <iframe id="formFrame" src="" frameborder="0"></iframe>
+    </div>
+
+  </div>
+
+<script>
+  const formSVGIcon = `
+    <svg class="formIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" >
+      <path d="M6 2h9l5 5v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM15 3.5V8h4.5L15 3.5zM8 11h8v2H8v-2zm0 4h8v2H8v-2z"/>
+    </svg>
+  `;
+
+  const forms = [
+    { formId: "A.1", url: "https://tally.so/r/nWgYee", title: "نموذج قبول عميل جديد / استمرار" },
+    { formId: "A.2", url: "https://tally.so/r/3x6VZd", title: "نموذج تثبيت الاستقلالية" },
+    { formId: "A.3", url: "https://tally.so/r/wAQr8y", title: "كتاب التعيين" },
+    { formId: "A.4", url: "https://tally.so/r/wMG15l", title: "نبذة عن العميل ونشاطه" },
+    { formId: "A.5", url: "https://tally.so/r/wox9ZM", title: "مذكرة تخطيط التدقيق" },
+    { formId: "A.6", url: "https://tally.so/r/w8ENWA", title: "الأهمية النسبية" },
+    { formId: "A.7", url: "https://tally.so/r/wgOLJd", title: "فحص إجراءات الرقابة" },
+    { formId: "A.8", url: "https://tally.so/r/3y7xAd", title: "كتاب الملاحظات على الضبط الداخلي" },
+    { formId: "B.1", url: "https://tally.so/r/wdRlGV", title: "نموذج كتاب النواقص" },
+    { formId: "B.2", url: "https://tally.so/r/mYqrBv", title: "البيانات المالية النهائية" },
+    { formId: "B.3", url: "https://tally.so/r/mDW5OE", title: "مسودة البيانات المالية" },
+    { formId: "B.4", url: "https://tally.so/r/3l4L2X", title: "مسودة البيانات المالية المربطة" },
+    { formId: "B.5", url: "https://tally.so/r/mRrReQ", title: "تربيط ميزان المراجعة" },
+    { formId: "B.6", url: "https://tally.so/r/woxoNN", title: "ميزان المراجعة النهائي" },
+    { formId: "B.7", url: "https://tally.so/r/3qNO8O", title: "محاضر اجتماعات مجلس الإدارة" },
+    { formId: "B.8", url: "https://tally.so/r/n0ALq9", title: "ملخص القضايا وكتاب المستشار القانوني" },
+    { formId: "B.9", url: "https://tally.so/r/3l4L8o", title: "الوضع الضريبي وكشف الضريبة" },
+    { formId: "B.10", url: "https://tally.so/r/wal0MX", title: "نموذج الأحداث اللاحقة" },
+    { formId: "B.11", url: "https://tally.so/r/meoLJl", title: "نموذج الاستمرارية" },
+    { formId: "B.12", url: "https://tally.so/r/wvW4kD", title: "كتاب التمثيل" },
+    { formId: "B.13", url: "https://tally.so/r/wgOL24", title: "نموذج الإفصاحات للمعايير" },
+    { formId: "B.14", url: "https://tally.so/r/nrqV7R", title: "نموذج المعاملات مع الأطراف" },
+    { formId: "B.15", url: "https://tally.so/r/wal07B", title: "كتاب ومتطلبات الإقفال" },
+    { formId: "B.16", url: "https://tally.so/r/mVxV2g", title: "تحديث ملف التدقيق الدائم" },
+    { formId: "C.1", url: "https://tally.so/r/w4GN1B", title: "قائمة المركز المالي" },
+    { formId: "C.2", url: "https://tally.so/r/3qNEYd", title: "قائمة الدخل الشامل" },
+    { formId: "C.10", url: "https://tally.so/r/wQEBxA", title: "النقد وما في حكمه" },
+    { formId: "C.20", url: "https://tally.so/r/3y7q0p", title: "الذمم التجارية المدينة" },
+    { formId: "C.30", url: "https://tally.so/r/w8EpJY", title: "الاستثمارات" },
+    { formId: "C.40", url: "https://tally.so/r/w5OqlP", title: "المخزون" },
+    { formId: "C.50", url: "https://tally.so/r/wdR2Zy", title: "أرصدة مدينة أخرى" },
+    { formId: "C.60", url: "https://tally.so/r/mYqzo6", title: "الممتلكات والآلات والمعدات" },
+    { formId: "C.70", url: "https://tally.so/r/mZQRPa", title: "الأعباء المؤجلة والموجودات غير الملموسة" },
+    { formId: "C.80", url: "https://tally.so/r/3y700B", title: "الموجودات الأخرى غير المتداولة" },
+    { formId: "C.90", url: "https://tally.so/r/n0AbbN", title: "نموذج الأطراف ذات العلاقة" },
+    { formId: "C.100", url: "https://tally.so/r/3l40VB", title: "الديون المتداولة" },
+    { formId: "C.110", url: "https://tally.so/r/mRrZ8d", title: "الذمم التجارية الدائنة" },
+    { formId: "C.120", url: "https://tally.so/r/wox0le", title: "أرصدة دائنة أخرى" },
+    { formId: "C.130", url: "https://tally.so/r/mOVj87", title: "نموذج المطلوبات غير المتداولة" },
+    { formId: "C.140", url: "https://tally.so/r/mZQGPy", title: "نموذج الالتزامات والتعاقدات الطارئة" },
+    { formId: "C.150", url: "https://tally.so/r/wvW0qQ", title: "حقوق الملكية" },
+    { formId: "C.160", url: "https://tally.so/r/wMGrvX", title: "فحص المبيعات وإيرادات التشغيل" },
+    { formId: "C.170", url: "https://tally.so/r/3l40KW", title: "فحص التكاليف المباشرة" },
+    { formId: "C.180", url: "https://tally.so/r/3NO4MQ", title: "فحص المصروفات العمومية والإدارية" },
+    { formId: "C.190", url: "https://tally.so/r/wkr0KM", title: "مصاريف البيع والتوزيع" },
+    { formId: "C.200", url: "https://tally.so/r/wvW0EQ", title: "الإيرادات الأخرى" },
+    { formId: "C.210", url: "https://tally.so/r/wLoEa1", title: "الخسائر الأخرى" },
+    { formId: "C.220", url: "https://tally.so/r/3y70o4", title: "فحص أرباح وخسائر الاستثمارات" },
+    { formId: "C.230", url: "https://tally.so/r/nrq0Jv", title: "فحص تكاليف التمويل" },
+    { formId: "C.240", url: "https://tally.so/r/mOVjbK", title: "فحص الضرائب والضرائب المؤجلة" }
+  ];
+
+  const container = document.getElementById("formsGrid");
+  const iframe = document.getElementById("formFrame");
+  const inputGroup = document.getElementById("inputGroup");
+  const selectedClientNameDiv = document.getElementById("selectedClientName");
+  const changeClientBtn = document.getElementById("changeClientBtn");
+
+  let selectedCard = null;
+  let currentClient = null;
+
+  function showForms() {
+    const client = document.getElementById("clientName").value.trim();
+
+    if (!client) {
+      alert("الرجاء إدخال اسم العميل");
+      return;
+    }
+
+    currentClient = client;
+
+    // إخفاء حقل الإدخال مع الزر
+    inputGroup.style.opacity = "0";
+    inputGroup.style.height = "0";
+    inputGroup.style.marginBottom = "0";
+    setTimeout(() => {
+      inputGroup.style.display = "none";
+    }, 500);
+
+    // عرض اسم العميل فوق الفورم
+    selectedClientNameDiv.textContent = `العميل: ${client}`;
+    selectedClientNameDiv.style.display = "block";
+
+    // إظهار زر تغيير العميل
+    changeClientBtn.style.display = "inline-block";
+
+    container.innerHTML = "";
+    iframe.style.display = "none";
+    iframe.src = "";
+
+    selectedCard = null;
+
+    forms.forEach(form => {
+      const card = document.createElement("div");
+      card.className = "formCard";
+      card.title = form.title;
+      card.innerHTML = `
+        ${formSVGIcon}
+        <div class="formId">${form.formId}</div>
+        <div class="formTitle">${form.title}</div>
+      `;
+
+      card.onclick = () => {
+        if (selectedCard) {
+          selectedCard.classList.remove("selected");
+        }
+        card.classList.add("selected");
+        selectedCard = card;
+
+        iframe.src = `${form.url}?client=${encodeURIComponent(currentClient)}&form_id=${encodeURIComponent(form.formId)}`;
+        iframe.style.display = "block";
+        iframe.scrollIntoView({ behavior: "smooth" });
+      };
+
+      container.appendChild(card);
+    });
+  }
+
+  function changeClient() {
+    // إخفاء الفورم والقائمة والاسم
+    iframe.style.display = "none";
+    iframe.src = "";
+    container.innerHTML = "";
+    selectedClientNameDiv.style.display = "none";
+    selectedClientNameDiv.textContent = "";
+    changeClientBtn.style.display = "none";
+
+    // إظهار حقل الإدخال مرة أخرى
+    inputGroup.style.display = "flex";
+    setTimeout(() => {
+      inputGroup.style.opacity = "1";
+      inputGroup.style.height = "";
+      inputGroup.style.marginBottom = "30px";
+    }, 50);
+
+    // إعادة تعيين الحقل
+    document.getElementById("clientName").value = "";
+    document.getElementById("clientName").focus();
+
+    currentClient = null;
+    selectedCard = null;
+  }
+  
+</script>
+
+</body>
+</html>
+  <script>
+    // تمييز الرابط الحالي في الهيدر
+    const currentPage = window.location.pathname.split('/').pop();
+    document.querySelectorAll('.nav-link').forEach(link => {
+      if (link.getAttribute('href') === currentPage) {
+        link.classList.add('active');
+      }
+    });
+  const settingsBtn = document.getElementById("settingsBtn");
+  const supportDropdown = document.getElementById("supportDropdown");
+
+  settingsBtn.addEventListener("click", () => {
+    supportDropdown.style.display =
+      supportDropdown.style.display === "block" ? "none" : "block";
+  });
+
+  // Close dropdown when clicking outside
+  window.addEventListener("click", function (e) {
+    if (!settingsBtn.contains(e.target) && !supportDropdown.contains(e.target)) {
+      supportDropdown.style.display = "none";
+    }
+  });
+
+  // Activate the current page
+  const current = window.location.pathname;
+  if (current.includes("addclient.html")) {
+    document.getElementById("addClientLink").classList.add("active");
+  } else if (current.includes("clientlist.html")) {
+    document.getElementById("clientListLink").classList.add("active");
+  }
+    const currentPage = window.location.pathname.split('/').pop();
+  const navLinks = document.querySelectorAll('.nav-link');
+
+  navLinks.forEach(link => {
+    const href = link.getAttribute('href');
+    if(href === currentPage){
+      link.classList.add('active');
+    }
+  });
+  </script>
+</body>
+</html>
