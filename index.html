@@ -112,7 +112,7 @@ function login() {
 
   // هنا تستبدل السطر الموجود بالسطر الجديد:
   // localStorage.setItem("loggedInUser", emailInput);
-  localStorage.setItem("user", JSON.stringify({ email: emailInput }));
+localStorage.setItem("loggedInUser", emailInput);
 
   window.location.href = users[emailInput].redirect;
 }
