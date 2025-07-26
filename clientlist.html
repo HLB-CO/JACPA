@@ -619,18 +619,17 @@
   });
 
   loadData();
-  <script>
   // إظهار اسم المستخدم أو إعادة التوجيه
   const user = localStorage.getItem("loggedInUser");
   if (!user) {
-    window.location.href = "login.html"; // غيّر المسار إذا لزم
+    window.location.href = "index.html"; // غيّر المسار إذا لزم
   } else {
     document.getElementById("user-info").textContent = "مرحبًا، " + user.split("@")[0];
   }
 
   function logout() {
     localStorage.removeItem("loggedInUser");
-    window.location.href = "login.html";
+    window.location.href = "index.html";
   }
 
   // Toggle إعدادات الدعم
