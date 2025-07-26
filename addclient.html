@@ -287,30 +287,36 @@
   </style>
 </head>
 <body>
+  
   <!-- Header/Navbar -->
-<header class="dashboard-header">
+<header class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background-color: #ffffff; color: #002244; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
   <div class="logo-container">
-    <img src="https://res.cloudinary.com/dvrjapxpd/image/upload/v1753147012/M__2_-removebg-preview_wuisdm.png" alt="Logo" />
+    <img src="https://res.cloudinary.com/dvrjapxpd/image/upload/v1753147012/M__2_-removebg-preview_wuisdm.png" alt="Logo" style="height: 40px;" />
   </div>
 
-<nav class="nav-links">
-  <a href="addclient.html" class="nav-link">Add Client</a>
-  <a href="clientlist.html" class="nav-link active">Client List</a>
-</nav>
+  <nav class="nav-links" style="display: flex; gap: 20px;">
+    <a href="addclient.html" class="nav-link" style="color: #002244; text-decoration: none; font-weight: 500;">Add Client</a>
+    <a href="clientlist.html" class="nav-link active" style="color: #002244; text-decoration: none; font-weight: 500;">Client List</a>
+  </nav>
 
+  <div class="header-actions" style="display: flex; align-items: center; gap: 15px;">
+    <span id="user-info" style="font-weight: bold;"></span>
 
-  <div class="header-actions">
-    <button id="settingsBtn"><i class="fas fa-cog"></i></button>
-    <div class="support-dropdown" id="supportDropdown">
-      <a href="https://api.whatsapp.com/send/?phone=962788677607&text&type=phone_number&app_absent=0" target="_blank">
+    <button onclick="logout()" style="background-color: #c00; border: none; color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer;">تسجيل الخروج</button>
+
+    <button id="settingsBtn" style="background: none; border: none; color: #002244; font-size: 18px; cursor: pointer;"><i class="fas fa-cog"></i></button>
+
+    <div class="support-dropdown" id="supportDropdown" style="display: none; position: absolute; top: 60px; right: 20px; background: #ffffff; color: #002244; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 10px;">
+      <a href="https://api.whatsapp.com/send/?phone=962788677607&text&type=phone_number&app_absent=0" target="_blank" style="display: block; margin-bottom: 8px; color: #002244; text-decoration: none;">
         <i class="fab fa-whatsapp"></i> WhatsApp
       </a>
-      <a href="mailto:abdulhadi.sa00@gmail.com">
+      <a href="mailto:abdulhadi.sa00@gmail.com" style="display: block; color: #002244; text-decoration: none;">
         <i class="fas fa-envelope"></i> Email
       </a>
     </div>
   </div>
 </header>
+
 
 
  <h2>Enter Client Name to View Forms</h2>
@@ -536,6 +542,33 @@
     const href = link.getAttribute('href');
     if(href === currentPage){
       link.classList.add('active');
+    }
+  });
+  // إظهار اسم المستخدم أو إعادة التوجيه
+  const user = localStorage.getItem("loggedInUser");
+  if (!user) {
+    window.location.href = "login.html"; // غيّر المسار إذا لزم
+  } else {
+    document.getElementById("user-info").textContent = "مرحبًا، " + user.split("@")[0];
+  }
+
+  function logout() {
+    localStorage.removeItem("loggedInUser");
+    window.location.href = "login.html";
+  }
+
+  // Toggle إعدادات الدعم
+  const settingsBtn = document.getElementById("settingsBtn");
+  const supportDropdown = document.getElementById("supportDropdown");
+
+  settingsBtn.addEventListener("click", () => {
+    supportDropdown.style.display = supportDropdown.style.display === "block" ? "none" : "block";
+  });
+
+  // إغلاق القائمة عند النقر خارجها
+  document.addEventListener("click", (e) => {
+    if (!settingsBtn.contains(e.target) && !supportDropdown.contains(e.target)) {
+      supportDropdown.style.display = "none";
     }
   });
   </script>
