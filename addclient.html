@@ -524,11 +524,24 @@ function logout() {
     });
 
     // تعيين اسم المستخدم (مثال)
-    function setUserInfo() {
-      const userInfoSpan = document.getElementById("user-info");
-      // هنا يمكنك جلب اسم المستخدم فعلياً من التخزين المحلي أو API
-      userInfoSpan.textContent = "MSINDAHA"; // مثال اسم المستخدم
-    }
+function setUserInfo() {
+  const userInfoSpan = document.getElementById("user-info");
+
+  // نحاول جلب المستخدم من التخزين المحلي
+  const storedUser = localStorage.getItem("user");
+
+  if (storedUser) {
+    const user = JSON.parse(storedUser);
+    const email = user.email;
+
+    // استخراج الاسم من البريد الإلكتروني
+    const name = email.split("@")[0];
+    userInfoSpan.textContent = name;
+  } else {
+    userInfoSpan.textContent = "غير مسجل";
+  }
+}
+
 
     // تهيئة الصفحة
     function init() {
