@@ -6,12 +6,7 @@
   <title>My Account - تسجيل الدخول</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Cairo', sans-serif;
       background: linear-gradient(to right, #002244, #004080);
@@ -21,7 +16,6 @@
       align-items: center;
       color: #fff;
     }
-
     .login-box {
       background: #ffffff;
       color: #333;
@@ -31,13 +25,11 @@
       max-width: 400px;
       box-shadow: 0 8px 25px rgba(0,0,0,0.2);
     }
-
     .login-box h2 {
       text-align: center;
       margin-bottom: 25px;
       color: #002244;
     }
-
     .login-box input {
       width: 100%;
       padding: 12px;
@@ -46,7 +38,6 @@
       border-radius: 8px;
       font-size: 16px;
     }
-
     .login-box button {
       width: 100%;
       padding: 12px;
@@ -59,18 +50,15 @@
       cursor: pointer;
       transition: 0.3s ease;
     }
-
     .login-box button:hover {
       background-color: #002244;
     }
-
     .error {
       color: red;
       text-align: center;
       margin-top: 10px;
       font-size: 14px;
     }
-
     @media (max-width: 480px) {
       .login-box {
         padding: 20px;
@@ -89,23 +77,41 @@
 
   <script>
     const users = {
-      "Shaded@hlbjordan.com": { password: "Ah@msindaha", redirect: "https://yourgithub.io/page1.html" },
-      "Jehad@hlbjordan.com": { password: "Jehad@msindaha", redirect: "https://yourgithub.io/page2.html" },
-      "Admin@hlbjordan.com": { password: "Adminmsindaha1372", redirect: "https://yourgithub.io/admin.html" },
-      "Thaer@hlbjordan.com": { password: "Thaer@msindaha", redirect: "https://yourgithub.io/page3.html" }
+      "shaded@hlbjordan.com": {
+        password: "Ah@msindaha",
+        redirect: "https://hlb-co.github.io/JACPA/index.html"
+      },
+      "jehad@hlbjordan.com": {
+        password: "Jehad@msindaha",
+        redirect: "https://hlb-co.github.io/JACPA/clientlist.html"
+      },
+      "admin@hlbjordan.com": {
+        password: "Adminmsindaha1372",
+        redirect: "https://hlb-co.github.io/JACPA/addclient.html"
+      },
+      "thaer@hlbjordan.com": {
+        password: "Thaer@msindaha",
+        redirect: "https://hlb-co.github.io/JACPA/clientlist.html"
+      }
     };
 
     function login() {
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
+      const emailInput = document.getElementById("email").value.trim().toLowerCase();
+      const passwordInput = document.getElementById("password").value.trim();
       const errorMsg = document.getElementById("error-msg");
 
-      if (users[email] && users[email].password === password) {
-        localStorage.setItem("loggedInUser", email);
-        window.location.href = users[email].redirect;
-      } else {
-        errorMsg.textContent = "البريد الإلكتروني أو كلمة المرور غير صحيحة";
+      if (!users[emailInput]) {
+        errorMsg.textContent = "البريد الإلكتروني غير موجود.";
+        return;
       }
+
+      if (users[emailInput].password !== passwordInput) {
+        errorMsg.textContent = "كلمة المرور غير صحيحة.";
+        return;
+      }
+
+      localStorage.setItem("loggedInUser", emailInput);
+      window.location.href = users[emailInput].redirect;
     }
   </script>
 </body>
