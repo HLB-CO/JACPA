@@ -406,36 +406,29 @@
   let activeClient = null;
 
   function fixDataString(str) {
-    try {
-      let wrapped = str.trim();
-      if (!wrapped.startsWith('{')) wrapped = '{' + wrapped + '}';
+  const result = {};
+  if (!str) return result;
 
-      let items = [...wrapped.matchAll(/\{([^{}]*?)\}/g)];
-      let result = {};
+  const matches = str.match(/\{[^}]+\}/g);
+  if (!matches) return result;
 
-      items.forEach(match => {
-        let content = match[1];
-        let jsonLike = '{' + content
-          .replace(/(\w+)=/g, '"$1":')
-          .replace(/:null/g, ':""')
-          .replace(/:([^{},]+)(,|$)/g, (m,p1,p2) => {
-            let v = p1.trim();
-            if(/^".*"$/.test(v) || /^'.*'$/.test(v)) return ':' + v + p2;
-            return ':' + JSON.stringify(v) + p2;
-          }) + '}';
-        try {
-          let obj = JSON.parse(jsonLike);
-          if(obj.label && obj.value !== undefined){
-            result[obj.label.trim()] = obj.value;
-          }
-        } catch(e) {}
-      });
+  matches.forEach(block => {
+    const content = block.slice(1, -1);
+    const pairs = content.split(',').map(p => p.trim());
+    let label = '';
+    let value = '';
 
-      return result;
-    } catch (e) {
-      return {};
-    }
-  }
+    pairs.forEach(pair => {
+      const [key, val] = pair.split('=').map(s => s.trim());
+      if (key === 'label') label = val.replace(/^"|"$/g, '');
+      else if (key === 'value') value = val.replace(/^"|"$/g, '');
+    });
+
+    if (label) result[label] = value;
+  });
+
+  return result;
+}
 
   function groupDataByClient() {
     clientsData = {};
