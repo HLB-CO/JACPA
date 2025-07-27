@@ -405,30 +405,73 @@
   let clientsData = {};
   let activeClient = null;
 
-  function fixDataString(str) {
+  function parseComplexData(str) {
   const result = {};
   if (!str) return result;
 
-  const matches = str.match(/\{[^}]+\}/g);
-  if (!matches) return result;
+  // تطابق كل كتلة حقل {key=..., label=..., type=..., value=..., options=...}
+  // نستخدم Regex مع مرونة للتعامل مع الخيارات المتعددة
+  const fieldBlocks = str.match(/\{key=[^}]+\}/g);
+  if (!fieldBlocks) return result;
 
-  matches.forEach(block => {
-    const content = block.slice(1, -1);
+  fieldBlocks.forEach(block => {
+    // نحذف الأقواس {}
+    let content = block.slice(1, -1);
+
+    // نبحث عن قسم options لو موجود
+    let optionsText = '';
+    const optionsIndex = content.indexOf('options=');
+    if (optionsIndex !== -1) {
+      optionsText = content.slice(optionsIndex + 8).trim();
+
+      // نحذف options من المحتوى الأصلي لتفكيك الباقي بسهولة
+      content = content.slice(0, optionsIndex).trim();
+    }
+
+    // نحول محتوى options إلى خريطة id -> text
+    const optionsMap = {};
+    if (optionsText) {
+      // خيارات ممكن تكون مثل: {id=..., text=...},{id=..., text=...}
+      const opts = optionsText.match(/\{[^}]+\}/g);
+      if (opts) {
+        opts.forEach(opt => {
+          const optContent = opt.slice(1, -1);
+          let id = '', text = '';
+          optContent.split(',').forEach(pair => {
+            const [k, v] = pair.split('=').map(s => s.trim());
+            if (k === 'id') id = v;
+            else if (k === 'text') text = v;
+          });
+          if (id) optionsMap[id] = text;
+        });
+      }
+    }
+
+    // الآن نفك باقي content لزوج key=value
     const pairs = content.split(',').map(p => p.trim());
     let label = '';
     let value = '';
 
     pairs.forEach(pair => {
-      const [key, val] = pair.split('=').map(s => s.trim());
-      if (key === 'label') label = val.replace(/^"|"$/g, '');
-      else if (key === 'value') value = val.replace(/^"|"$/g, '');
+      const [k, v] = pair.split('=').map(s => s.trim());
+      if (k === 'label') label = v;
+      else if (k === 'value') value = v;
     });
 
-    if (label) result[label] = value;
+    // استبدال قيمة value اذا هي uuid موجودة في optionsMap
+    if (optionsMap[value]) value = optionsMap[value];
+
+    // استبدال "null" بقيمة فارغة لعرض أنظف
+    if (value === 'null') value = '--';
+
+    if (label) {
+      result[label] = value;
+    }
   });
 
   return result;
 }
+
 
   function groupDataByClient() {
     clientsData = {};
