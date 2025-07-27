@@ -399,36 +399,43 @@
 <script>
   const SHEET_ID = "1oJoFsYqk0KAMeNSIzPVe82FqY0q__KEsWH3DJbId-YY";
   const SHEET_NAME = "Sheet1";
-  const SHEET_URL = https://opensheet.elk.sh/${SHEET_ID}/${SHEET_NAME};
+  const SHEET_URL = `https://opensheet.elk.sh/${SHEET_ID}/${SHEET_NAME}`;
 
   let rawData = [];
   let clientsData = {};
   let activeClient = null;
 
   function fixDataString(str) {
-  const result = {};
-  if (!str) return result;
+    try {
+      let wrapped = str.trim();
+      if (!wrapped.startsWith('{')) wrapped = '{' + wrapped + '}';
 
-  const matches = str.match(/\{[^}]+\}/g);
-  if (!matches) return result;
+      let items = [...wrapped.matchAll(/\{([^{}]*?)\}/g)];
+      let result = {};
 
-  matches.forEach(block => {
-    const content = block.slice(1, -1);
-    const pairs = content.split(',').map(p => p.trim());
-    let label = '';
-    let value = '';
+      items.forEach(match => {
+        let content = match[1];
+        let jsonLike = '{' + content
+          .replace(/(\w+)=/g, '"$1":')
+          .replace(/:null/g, ':""')
+          .replace(/:([^{},]+)(,|$)/g, (m,p1,p2) => {
+            let v = p1.trim();
+            if(/^".*"$/.test(v) || /^'.*'$/.test(v)) return ':' + v + p2;
+            return ':' + JSON.stringify(v) + p2;
+          }) + '}';
+        try {
+          let obj = JSON.parse(jsonLike);
+          if(obj.label && obj.value !== undefined){
+            result[obj.label.trim()] = obj.value;
+          }
+        } catch(e) {}
+      });
 
-    pairs.forEach(pair => {
-      const [key, val] = pair.split('=').map(s => s.trim());
-      if (key === 'label') label = val.replace(/^"|"$/g, '');
-      else if (key === 'value') value = val.replace(/^"|"$/g, '');
-    });
-
-    if (label) result[label] = value;
-  });
-
-  return result;
-}
+      return result;
+    } catch (e) {
+      return {};
+    }
+  }
 
   function groupDataByClient() {
     clientsData = {};
@@ -474,10 +481,10 @@
       let div = document.createElement('div');
       div.className = 'client-item';
       if(client === activeClient) div.classList.add('active');
-      div.innerHTML = 
+      div.innerHTML = `
         <span class="client-name">${client}</span>
         <span class="client-date">${latestDate ? new Date(latestDate).toLocaleString('ar-EG') : '-'}</span>
-      ;
+      `;
       div.onclick = () => {
         activeClient = client;
         renderClientsList(document.getElementById('clientSearch').value.trim());
@@ -489,12 +496,12 @@
 
   function renderClientDetails(client) {
     const panel = document.getElementById('detailsPanel');
-    panel.innerHTML = <h2>تفاصيل العميل: ${client}</h2>;
+    panel.innerHTML = `<h2>تفاصيل العميل: ${client}</h2>`;
 
     let responses = clientsData[client] || [];
 
     if(responses.length === 0){
-      panel.innerHTML += <p>لا توجد بيانات لهذا العميل.</p>;
+      panel.innerHTML += `<p>لا توجد بيانات لهذا العميل.</p>`;
       return;
     }
 
@@ -540,7 +547,7 @@
 
     const formattedDate = createdAt ? new Date(createdAt).toLocaleString('ar-EG') : '-';
 
-    let html = 
+    let html = `
       <html lang="ar" dir="rtl">
       <head>
         <title>تفاصيل العميل: ${client}</title>
@@ -559,19 +566,19 @@
       <body>
         <h1>تفاصيل العميل: ${client}</h1>
         <p><strong>التاريخ:</strong> ${formattedDate}</p>
-    ;
+    `;
 
     for (const [label, valueRaw] of Object.entries(dataObj)) {
       const value = valueRaw === undefined || valueRaw === null ? '-' : valueRaw.toString();
-      html += 
+      html += `
         <div class="field">
           <div class="label">${label}</div>
           <div class="value">${value}</div>
         </div>
-      ;
+      `;
     }
 
-    html += <button onclick="window.print()">طباعة الصفحة</button></body></html>;
+    html += `<button onclick="window.print()">طباعة الصفحة</button></body></html>`;
 
     printWindow.document.write(html);
     printWindow.document.close();
@@ -622,7 +629,6 @@
     window.location.href = "index.html";
   }
 </script>
-  
 
 </body>
 </html>
