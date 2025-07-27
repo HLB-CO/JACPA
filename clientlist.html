@@ -405,40 +405,36 @@
   let clientsData = {};
   let activeClient = null;
 
-  function fixDataString(str) {
-  const result = {};
-  if (!str) return result;
+  // دالة لتحويل الحقول من array لكائن مع استبدال UUID بالنص الصحيح
+  function parseFields(fieldsArray) {
+    const result = {};
+    fieldsArray.forEach(field => {
+      let value = field.value;
 
-  // ابحث عن كتل { label=..., value=... }
-  const regex = /\{([^}]+)\}/g;
-  let match;
+      // لو في خيارات، نحول UUID إلى نص
+      if (field.options && Array.isArray(field.options)) {
+        const foundOption = field.options.find(opt => opt.id === value);
+        if (foundOption) {
+          value = foundOption.text;
+        }
+      }
 
-  while ((match = regex.exec(str)) !== null) {
-    const block = match[1]; // المحتوى داخل القوسين
-    const parts = block.split(',').map(p => p.trim());
+      // تنظيف لابل ونزع النقطتين
+      let label = field.label.trim();
+      if (label.endsWith(':')) label = label.slice(0, -1);
 
-    let label = '';
-    let value = '';
-
-    parts.forEach(part => {
-      const [key, val] = part.split('=').map(s => s.trim());
-      if (key === 'label') label = val.replace(/^"|"$/g, '');
-      else if (key === 'value') value = val.replace(/^"|"$/g, '');
+      result[label] = (value === null || value === undefined) ? '-' : value;
     });
-
-    if (label) {
-      result[label] = value;
-    }
+    return result;
   }
 
-  return result;
-}
-
+  // بناء وتجميع البيانات حسب العميل
   function groupDataByClient() {
     clientsData = {};
     rawData.forEach(row => {
-      let cleaned = fixDataString(row.data || "");
-      let clientName = cleaned['client'] || cleaned['اسم العميل'] || null;
+      // استخدم parseFields على row.fields مباشرة
+      const cleaned = parseFields(row.fields || []);
+      let clientName = cleaned['client'] || cleaned['إسم العميل'] || cleaned['اسم العميل'] || null;
       if (!clientName) return;
 
       let createdAt = row.createdAt || "";
@@ -452,11 +448,13 @@
       });
     });
 
+    // ترتيب الردود من الأحدث للأقدم
     for (let client in clientsData) {
       clientsData[client].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
     }
   }
 
+  // عرض قائمة العملاء مع فلتر البحث
   function renderClientsList(filter="") {
     const container = document.getElementById('clientsContainer');
     container.innerHTML = '';
@@ -478,10 +476,9 @@
       let div = document.createElement('div');
       div.className = 'client-item';
       if(client === activeClient) div.classList.add('active');
-      div.innerHTML = `
-        <span class="client-name">${client}</span>
-        <span class="client-date">${latestDate ? new Date(latestDate).toLocaleString('ar-EG') : '-'}</span>
-      `;
+      div.innerHTML = 
+        `<span class="client-name">${client}</span>
+        <span class="client-date">${latestDate ? new Date(latestDate).toLocaleString('ar-EG') : '-'}</span>`;
       div.onclick = () => {
         activeClient = client;
         renderClientsList(document.getElementById('clientSearch').value.trim());
@@ -491,76 +488,63 @@
     });
   }
 
-  function isUUID(str) {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
-}
+  // عرض تفاصيل العميل مع زر طباعة لكل رد
+  function renderClientDetails(client) {
+    const panel = document.getElementById('detailsPanel');
+    panel.innerHTML = `<h2>تفاصيل العميل: ${client}</h2>`;
 
-function renderClientDetails(client) {
-  const panel = document.getElementById('detailsPanel');
-  panel.innerHTML = `<h2>تفاصيل العميل: ${client}</h2>`;
+    let responses = clientsData[client] || [];
 
-  let responses = clientsData[client] || [];
+    if(responses.length === 0){
+      panel.innerHTML += `<p>لا توجد بيانات لهذا العميل.</p>`;
+      return;
+    }
 
-  if(responses.length === 0){
-    panel.innerHTML += `<p>لا توجد بيانات لهذا العميل.</p>`;
-    return;
+    responses.forEach((resp) => {
+      const card = document.createElement('div');
+      card.className = 'response-card';
+
+      const header = document.createElement('div');
+      header.className = 'response-header';
+
+      const dateSpan = document.createElement('div');
+      dateSpan.className = 'date';
+      dateSpan.textContent = resp.createdAt ? new Date(resp.createdAt).toLocaleString('ar-EG') : '-';
+
+      const downloadBtn = document.createElement('button');
+      downloadBtn.className = 'download-pdf';
+      downloadBtn.title = "طباعة تفاصيل هذا الرد";
+      downloadBtn.textContent = 'طباعة التفاصيل';
+      downloadBtn.onclick = () => printClientResponse(client, resp.createdAt, resp.cleanedData);
+
+      header.appendChild(dateSpan);
+      header.appendChild(downloadBtn);
+
+      card.appendChild(header);
+
+      Object.entries(resp.cleanedData).forEach(([label, value]) => {
+        const fieldDiv = document.createElement('div');
+        const labelEl = document.createElement('label');
+        labelEl.textContent = label;
+        const valueEl = document.createElement('span');
+        valueEl.textContent = value || '-';
+        fieldDiv.appendChild(labelEl);
+        fieldDiv.appendChild(valueEl);
+        card.appendChild(fieldDiv);
+      });
+
+      panel.appendChild(card);
+    });
   }
 
-  responses.forEach((resp) => {
-    const card = document.createElement('div');
-    card.className = 'response-card';
-
-    const header = document.createElement('div');
-    header.className = 'response-header';
-
-    const dateSpan = document.createElement('div');
-    dateSpan.className = 'date';
-    dateSpan.textContent = resp.createdAt ? new Date(resp.createdAt).toLocaleString('ar-EG') : '-';
-
-    const downloadBtn = document.createElement('button');
-    downloadBtn.className = 'download-pdf';
-    downloadBtn.title = "طباعة تفاصيل هذا الرد";
-    downloadBtn.textContent = 'طباعة التفاصيل';
-    downloadBtn.onclick = () => printClientResponse(client, resp.createdAt, resp.cleanedData);
-
-    header.appendChild(dateSpan);
-    header.appendChild(downloadBtn);
-
-    card.appendChild(header);
-
-    Object.entries(resp.cleanedData).forEach(([label, value]) => {
-      let displayLabel = label;
-
-      if (isUUID(label)) {
-        // إذا الـ label UUID، وإذا قيمة value نص واضح، استعمل القيمة كاسم السؤال
-        if (value && typeof value === 'string' && value.length < 100 && !isUUID(value)) {
-          displayLabel = value;
-          value = '-';  // لأن القيمة أصبحت عنوان السؤال، نجعل القيمة فارغة
-        }
-      }
-
-      const fieldDiv = document.createElement('div');
-      const labelEl = document.createElement('label');
-      labelEl.textContent = displayLabel;
-      const valueEl = document.createElement('span');
-      valueEl.textContent = value || '-';
-      fieldDiv.appendChild(labelEl);
-      fieldDiv.appendChild(valueEl);
-      card.appendChild(fieldDiv);
-    });
-
-    panel.appendChild(card);
-  });
-}
-
-
+  // طباعة بيانات الرد كصفحة جديدة (يمكن طباعتها أو حفظها PDF من المتصفح)
   function printClientResponse(client, createdAt, dataObj) {
     const printWindow = window.open('', '_blank', 'width=800,height=600');
 
     const formattedDate = createdAt ? new Date(createdAt).toLocaleString('ar-EG') : '-';
 
-    let html = `
-      <html lang="ar" dir="rtl">
+    let html = 
+      `<html lang="ar" dir="rtl">
       <head>
         <title>تفاصيل العميل: ${client}</title>
         <style>
@@ -577,17 +561,15 @@ function renderClientDetails(client) {
       </head>
       <body>
         <h1>تفاصيل العميل: ${client}</h1>
-        <p><strong>التاريخ:</strong> ${formattedDate}</p>
-    `;
+        <p><strong>التاريخ:</strong> ${formattedDate}</p>`;
 
     for (const [label, valueRaw] of Object.entries(dataObj)) {
       const value = valueRaw === undefined || valueRaw === null ? '-' : valueRaw.toString();
-      html += `
-        <div class="field">
+      html += 
+        `<div class="field">
           <div class="label">${label}</div>
           <div class="value">${value}</div>
-        </div>
-      `;
+        </div>`;
     }
 
     html += `<button onclick="window.print()">طباعة الصفحة</button></body></html>`;
@@ -596,6 +578,7 @@ function renderClientDetails(client) {
     printWindow.document.close();
   }
 
+  // جلب البيانات من Google Sheet وتجهيزها للعرض
   async function loadData() {
     try {
       rawData = await fetch(SHEET_URL).then(r => r.json());
@@ -607,6 +590,7 @@ function renderClientDetails(client) {
     }
   }
 
+  // حدث فلترة البحث حسب نص المستخدم
   document.getElementById('clientSearch').addEventListener('input', e => {
     renderClientsList(e.target.value.trim());
   });
@@ -636,6 +620,7 @@ function renderClientDetails(client) {
     document.getElementById("user-info").textContent = "مرحبًا، " + user.split("@")[0];
   }
 
+  // دالة تسجيل الخروج
   function logout() {
     localStorage.removeItem("loggedInUser");
     window.location.href = "index.html";
