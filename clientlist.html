@@ -491,53 +491,68 @@
     });
   }
 
-  function renderClientDetails(client) {
-    const panel = document.getElementById('detailsPanel');
-    panel.innerHTML = `<h2>تفاصيل العميل: ${client}</h2>`;
+  function isUUID(str) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
+}
 
-    let responses = clientsData[client] || [];
+function renderClientDetails(client) {
+  const panel = document.getElementById('detailsPanel');
+  panel.innerHTML = `<h2>تفاصيل العميل: ${client}</h2>`;
 
-    if(responses.length === 0){
-      panel.innerHTML += `<p>لا توجد بيانات لهذا العميل.</p>`;
-      return;
-    }
+  let responses = clientsData[client] || [];
 
-    responses.forEach((resp) => {
-      const card = document.createElement('div');
-      card.className = 'response-card';
-
-      const header = document.createElement('div');
-      header.className = 'response-header';
-
-      const dateSpan = document.createElement('div');
-      dateSpan.className = 'date';
-      dateSpan.textContent = resp.createdAt ? new Date(resp.createdAt).toLocaleString('ar-EG') : '-';
-
-      const downloadBtn = document.createElement('button');
-      downloadBtn.className = 'download-pdf';
-      downloadBtn.title = "طباعة تفاصيل هذا الرد";
-      downloadBtn.textContent = 'طباعة التفاصيل';
-      downloadBtn.onclick = () => printClientResponse(client, resp.createdAt, resp.cleanedData);
-
-      header.appendChild(dateSpan);
-      header.appendChild(downloadBtn);
-
-      card.appendChild(header);
-
-      Object.entries(resp.cleanedData).forEach(([label, value]) => {
-        const fieldDiv = document.createElement('div');
-        const labelEl = document.createElement('label');
-        labelEl.textContent = label;
-        const valueEl = document.createElement('span');
-        valueEl.textContent = value || '-';
-        fieldDiv.appendChild(labelEl);
-        fieldDiv.appendChild(valueEl);
-        card.appendChild(fieldDiv);
-      });
-
-      panel.appendChild(card);
-    });
+  if(responses.length === 0){
+    panel.innerHTML += `<p>لا توجد بيانات لهذا العميل.</p>`;
+    return;
   }
+
+  responses.forEach((resp) => {
+    const card = document.createElement('div');
+    card.className = 'response-card';
+
+    const header = document.createElement('div');
+    header.className = 'response-header';
+
+    const dateSpan = document.createElement('div');
+    dateSpan.className = 'date';
+    dateSpan.textContent = resp.createdAt ? new Date(resp.createdAt).toLocaleString('ar-EG') : '-';
+
+    const downloadBtn = document.createElement('button');
+    downloadBtn.className = 'download-pdf';
+    downloadBtn.title = "طباعة تفاصيل هذا الرد";
+    downloadBtn.textContent = 'طباعة التفاصيل';
+    downloadBtn.onclick = () => printClientResponse(client, resp.createdAt, resp.cleanedData);
+
+    header.appendChild(dateSpan);
+    header.appendChild(downloadBtn);
+
+    card.appendChild(header);
+
+    Object.entries(resp.cleanedData).forEach(([label, value]) => {
+      let displayLabel = label;
+
+      if (isUUID(label)) {
+        // إذا الـ label UUID، وإذا قيمة value نص واضح، استعمل القيمة كاسم السؤال
+        if (value && typeof value === 'string' && value.length < 100 && !isUUID(value)) {
+          displayLabel = value;
+          value = '-';  // لأن القيمة أصبحت عنوان السؤال، نجعل القيمة فارغة
+        }
+      }
+
+      const fieldDiv = document.createElement('div');
+      const labelEl = document.createElement('label');
+      labelEl.textContent = displayLabel;
+      const valueEl = document.createElement('span');
+      valueEl.textContent = value || '-';
+      fieldDiv.appendChild(labelEl);
+      fieldDiv.appendChild(valueEl);
+      card.appendChild(fieldDiv);
+    });
+
+    panel.appendChild(card);
+  });
+}
+
 
   function printClientResponse(client, createdAt, dataObj) {
     const printWindow = window.open('', '_blank', 'width=800,height=600');
