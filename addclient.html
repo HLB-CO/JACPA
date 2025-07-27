@@ -572,4 +572,84 @@ document.addEventListener("DOMContentLoaded", init);
 
   </script>
 </body>
+<script>
+  // روابط المستندات لكل formId
+  const documentLinks = {
+    "A.2": "https://docs.google.com/document/d/1s8QuGqX0GpyOXkWmk7gfuue63q6I-9w-GqrNGCdLr50/edit?usp=sharing",
+    "A.3": "https://docs.google.com/document/d/15rd1u_2TcI4tkGOeJmUhoivqj8d5cQI6MFEVKtSO1ck/edit?usp=sharing",
+    "A.8": "https://docs.google.com/document/d/1aNGEcpHb6mklTKYuOXMaojRyr5GhwXNe2m-HpKg-pmo/edit?usp=sharing",
+    "B.1": "https://docs.google.com/document/d/19PuQ-zBNkIPhLwuQ1y3zKtmj_ODwlM_C2ZwWAJgEa3o/edit?usp=sharing",
+    "B.5": "https://docs.google.com/document/d/1P6U06DgM_vt3F5nGSLJIDk--VAHKSGLKUkaGqWgCtbc/edit?usp=sharing",
+    "B.8": "https://docs.google.com/document/d/11zzgJw0611QULavBZSArRZYdbAUpCFIx4-nmnOZXoYs/edit?usp=sharing",
+    "B.12": "https://docs.google.com/document/d/1tpklJ2cM4fsWAGpbjRxSnodA5rTOISjgfbbFo1Z658w/edit?usp=sharing",
+    "B.15": "https://docs.google.com/document/d/1DMHGTgR657P2D9pCvYyE3FXG2JJbP9m2wLgACrbub2k/edit?usp=sharing"
+  };
+
+  // تعديل دالة createFormCards لإضافة زر Open Document فقط للنماذج التي لها رابط مستند
+  function createFormCards() {
+    formsGrid.innerHTML = ""; // تفريغ المحتوى القديم
+    forms.forEach((form, index) => {
+      const card = document.createElement("div");
+      card.className = "formCard";
+      card.dataset.index = index;
+      card.innerHTML = `
+        ${formSVGIcon}
+        <span class="formId">${form.formId}</span>
+        <span class="formTitle">${form.title}</span>
+      `;
+
+      // إذا للنموذج رابط مستند، أضف زر Open Document
+      if (documentLinks.hasOwnProperty(form.formId)) {
+        card.innerHTML += `<button class="open-document-btn">Open Document</button>`;
+      }
+
+      // عند الضغط على البطاقة يختار النموذج ويفتحه في iframe (باستثناء الضغط على الزر)
+      card.addEventListener("click", (e) => {
+        if (e.target.classList.contains("open-document-btn")) return;
+        selectForm(index);
+      });
+
+      // حدث زر فتح المستند في تاب جديد (إذا الزر موجود)
+      const openDocBtn = card.querySelector(".open-document-btn");
+      if (openDocBtn) {
+        openDocBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const link = documentLinks[form.formId];
+          if (link) {
+            window.open(link, "_blank");
+          } else {
+            alert("لا يوجد مستند مرتبط بهذا النموذج.");
+          }
+        });
+      }
+
+      formsGrid.appendChild(card);
+    });
+  }
+
+  // إضافة CSS للزر Open Document بعد تحميل الصفحة
+  document.addEventListener("DOMContentLoaded", () => {
+    const style = document.createElement("style");
+    style.textContent = `
+      .open-document-btn {
+        background-color: #1a237e;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-top: 6px;
+      }
+      .open-document-btn:hover {
+        background-color: #3949ab;
+      }
+    `;
+    document.head.appendChild(style);
+  });
+</script>
+
+</script>
+
 </html>
