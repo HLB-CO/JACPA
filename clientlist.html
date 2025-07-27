@@ -440,28 +440,29 @@
 
   // تجميع الردود حسب اسم العميل
   function groupDataByClient() {
-    clientsData = {};
-    rawData.forEach(row => {
-      let cleaned = fixDataString(row.data || "");
-      let clientName = cleaned['client'] || cleaned['اسم العميل'] || null;
-      if (!clientName) return;
+  clientsData = {};
+  rawData.forEach(row => {
+    // استبدل "F" باسم المفتاح الصحيح
+    let cleaned = fixDataString(row["F"] || ""); 
 
-      let createdAt = row.createdAt || "";
+    let clientName = cleaned['client'] || cleaned['اسم العميل'] || null;
+    if (!clientName) return;
 
-      if (!clientsData[clientName]) clientsData[clientName] = [];
+    let createdAt = row.createdAt || "";
 
-      clientsData[clientName].push({
-        createdAt,
-        dataRaw: row.data || "",
-        cleanedData: cleaned
-      });
+    if (!clientsData[clientName]) clientsData[clientName] = [];
+
+    clientsData[clientName].push({
+      createdAt,
+      dataRaw: row["F"] || "",
+      cleanedData: cleaned
     });
+  });
 
-    // ترتيب الردود لكل عميل حسب التاريخ (الأحدث أول)
-    for (let client in clientsData) {
-      clientsData[client].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
-    }
+  for (let client in clientsData) {
+    clientsData[client].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
   }
+}
 
   // عرض قائمة العملاء مع البحث
   function renderClientsList(filter="") {
