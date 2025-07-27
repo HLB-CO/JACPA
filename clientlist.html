@@ -405,46 +405,36 @@
   let clientsData = {};
   let activeClient = null;
 
-  // دالة لتحليل نص البيانات الخام واستخراج الحقول
-  function parseFieldsFromDataString(str) {
-    const result = {};
-    if (!str) return result;
+  function fixDataString(str) {
+  const result = {};
+  if (!str) return result;
 
-    // إيجاد الجزء الذي يبدأ بـ fields={
-    const fieldsMatch = str.match(/fields=\{(.+)\}$/);
-    if (!fieldsMatch) return result;
+  const matches = str.match(/\{[^}]+\}/g);
+  if (!matches) return result;
 
-    const fieldsStr = fieldsMatch[1];
+  matches.forEach(block => {
+    const content = block.slice(1, -1);
+    const pairs = content.split(',').map(p => p.trim());
+    let label = '';
+    let value = '';
 
-    // استخراج كل حقل محاط بأقواس {}
-    const items = fieldsStr.match(/\{[^}]+\}/g);
-    if (!items) return result;
-
-    items.forEach(item => {
-      const content = item.slice(1, -1); // إزالة الأقواس {}
-      const pairs = content.split(',').map(s => s.trim());
-
-      let label = '';
-      let value = '';
-
-      pairs.forEach(pair => {
-        const [key, val] = pair.split('=').map(s => s.trim());
-        if (key === 'label') label = val.replace(/^"|"$/g, '');
-        else if (key === 'value') value = val.replace(/^"|"$/g, '');
-      });
-
-      if (label) result[label] = value;
+    pairs.forEach(pair => {
+      const [key, val] = pair.split('=').map(s => s.trim());
+      if (key === 'label') label = val.replace(/^"|"$/g, '');
+      else if (key === 'value') value = val.replace(/^"|"$/g, '');
     });
 
-    return result;
-  }
+    if (label) result[label] = value;
+  });
 
-  // تجميع البيانات حسب اسم العميل
+  return result;
+}
+
   function groupDataByClient() {
     clientsData = {};
     rawData.forEach(row => {
-      let cleaned = parseFieldsFromDataString(row.data || "");
-      let clientName = cleaned['client'] || cleaned['إسم العميل:'] || null;
+      let cleaned = fixDataString(row.data || "");
+      let clientName = cleaned['client'] || cleaned['اسم العميل'] || null;
       if (!clientName) return;
 
       let createdAt = row.createdAt || "";
@@ -463,7 +453,6 @@
     }
   }
 
-  // عرض قائمة العملاء مع إمكانية البحث
   function renderClientsList(filter="") {
     const container = document.getElementById('clientsContainer');
     container.innerHTML = '';
@@ -498,7 +487,6 @@
     });
   }
 
-  // عرض تفاصيل العميل والردود
   function renderClientDetails(client) {
     const panel = document.getElementById('detailsPanel');
     panel.innerHTML = `<h2>تفاصيل العميل: ${client}</h2>`;
@@ -547,7 +535,6 @@
     });
   }
 
-  // طباعة تفاصيل الرد في نافذة جديدة
   function printClientResponse(client, createdAt, dataObj) {
     const printWindow = window.open('', '_blank', 'width=800,height=600');
 
@@ -590,7 +577,6 @@
     printWindow.document.close();
   }
 
-  // تحميل البيانات من Google Sheets وتشغيل العرض
   async function loadData() {
     try {
       rawData = await fetch(SHEET_URL).then(r => r.json());
@@ -602,15 +588,31 @@
     }
   }
 
-  // حدث البحث
   document.getElementById('clientSearch').addEventListener('input', e => {
     renderClientsList(e.target.value.trim());
   });
 
-  // تحقق من تسجيل الدخول
+  // إعداد القائمة المنسدلة للإعدادات
+  const settingsBtn = document.getElementById('settingsBtn');
+  const supportDropdown = document.getElementById('supportDropdown');
+
+  settingsBtn.addEventListener('click', () => {
+    supportDropdown.style.display = supportDropdown.style.display === 'block' ? 'none' : 'block';
+  });
+
+  // إخفاء القائمة عند الضغط خارجها
+  document.addEventListener('click', (e) => {
+    if (!settingsBtn.contains(e.target) && !supportDropdown.contains(e.target)) {
+      supportDropdown.style.display = 'none';
+    }
+  });
+
+  loadData();
+
+  // إظهار اسم المستخدم أو إعادة التوجيه
   const user = localStorage.getItem("loggedInUser");
   if (!user) {
-    window.location.href = "index.html"; // عدّل الرابط حسب حاجتك
+    window.location.href = "index.html"; // غيّر المسار إذا لزم
   } else {
     document.getElementById("user-info").textContent = "مرحبًا، " + user.split("@")[0];
   }
@@ -619,9 +621,6 @@
     localStorage.removeItem("loggedInUser");
     window.location.href = "index.html";
   }
-
-  // بدء التحميل
-  loadData();
 </script>
 
 </body>
