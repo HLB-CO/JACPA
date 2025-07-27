@@ -405,85 +405,46 @@
   let clientsData = {};
   let activeClient = null;
 
-// دالتك لتحليل النصوص مع دعم الخيارات
-function fixDataStringWithOptions(str) {
-  const result = {};
-  if (!str) return result;
+  // دالة لتحليل نص البيانات الخام واستخراج الحقول
+  function parseFieldsFromDataString(str) {
+    const result = {};
+    if (!str) return result;
 
-  const matches = str.match(/\{[^}]+\}/g);
-  if (!matches) return result;
+    // إيجاد الجزء الذي يبدأ بـ fields={
+    const fieldsMatch = str.match(/fields=\{(.+)\}$/);
+    if (!fieldsMatch) return result;
 
-  matches.forEach(block => {
-    const content = block.slice(1, -1);
-    const pairs = content.split(',').map(p => p.trim());
+    const fieldsStr = fieldsMatch[1];
 
-    let label = '';
-    let value = '';
-    let options = [];
+    // استخراج كل حقل محاط بأقواس {}
+    const items = fieldsStr.match(/\{[^}]+\}/g);
+    if (!items) return result;
 
-    pairs.forEach(pair => {
-      const [key, val] = pair.split('=').map(s => s.trim());
+    items.forEach(item => {
+      const content = item.slice(1, -1); // إزالة الأقواس {}
+      const pairs = content.split(',').map(s => s.trim());
 
-      if (key === 'label') {
-        label = val.replace(/^"|"$/g, '');
-      } else if (key === 'value') {
-        value = val.replace(/^"|"$/g, '');
-      } else if (key === 'options') {
-        const optsString = content.match(/options=\{(.+)\}$/);
-        if (optsString) {
-          options = parseOptions(optsString[1]);
-        }
-      }
+      let label = '';
+      let value = '';
+
+      pairs.forEach(pair => {
+        const [key, val] = pair.split('=').map(s => s.trim());
+        if (key === 'label') label = val.replace(/^"|"$/g, '');
+        else if (key === 'value') value = val.replace(/^"|"$/g, '');
+      });
+
+      if (label) result[label] = value;
     });
 
-    if (options.length > 0) {
-      const foundOption = options.find(o => o.id === value);
-      if (foundOption) {
-        value = foundOption.text;
-      }
-    }
+    return result;
+  }
 
-    if (label) result[label] = value;
-  });
-
-  return result;
-}
-
-function parseOptions(str) {
-  const opts = [];
-  const optionMatches = str.match(/\{[^}]+\}/g);
-  if (!optionMatches) return opts;
-
-  optionMatches.forEach(optBlock => {
-    const content = optBlock.slice(1, -1);
-    const pairs = content.split(',').map(p => p.trim());
-    let id = '';
-    let text = '';
-
-    pairs.forEach(pair => {
-      const [key, val] = pair.split('=').map(s => s.trim());
-      if (key === 'id') id = val.replace(/^"|"$/g, '');
-      else if (key === 'text') text = val.replace(/^"|"$/g, '');
-    });
-
-    if (id && text) {
-      opts.push({ id, text });
-    }
-  });
-
-  return opts;
-}
-
-// هنا تستدعي الدالة بعد تعريفها مباشرة
-const yourDataString = 'هنا تحط النص الخام الي عندك';  // مثلاً البيانات اللي جايه من السيرفر
-const fixedData = fixDataStringWithOptions(yourDataString);
-console.log(fixedData);
-
+  // تجميع البيانات حسب اسم العميل
   function groupDataByClient() {
     clientsData = {};
     rawData.forEach(row => {
-let cleaned = fixDataStringWithOptions(row.data || "");
-      let clientName = cleaned['client'] || cleaned['اسم العميل'] || null;
+      let cleaned = parseFieldsFromDataString(row.data || "");
+      let clientName = cleaned['client'] || cleaned['إسم العميل:'] || null;
       if (!clientName) return;
 
       let createdAt = row.createdAt || "";
@@ -502,6 +463,7 @@ let cleaned = fixDataStringWithOptions(row.data || "");
     }
   }
 
+  // عرض قائمة العملاء مع إمكانية البحث
   function renderClientsList(filter="") {
     const container = document.getElementById('clientsContainer');
     container.innerHTML = '';
@@ -536,6 +498,7 @@ let cleaned = fixDataStringWithOptions(row.data || "");
     });
   }
 
+  // عرض تفاصيل العميل والردود
   function renderClientDetails(client) {
     const panel = document.getElementById('detailsPanel');
     panel.innerHTML = `<h2>تفاصيل العميل: ${client}</h2>`;
@@ -584,6 +547,7 @@ let cleaned = fixDataStringWithOptions(row.data || "");
     });
   }
 
+  // طباعة تفاصيل الرد في نافذة جديدة
   function printClientResponse(client, createdAt, dataObj) {
     const printWindow = window.open('', '_blank', 'width=800,height=600');
 
@@ -626,6 +590,7 @@ let cleaned = fixDataStringWithOptions(row.data || "");
     printWindow.document.close();
   }
 
+  // تحميل البيانات من Google Sheets وتشغيل العرض
   async function loadData() {
     try {
       rawData = await fetch(SHEET_URL).then(r => r.json());
@@ -637,31 +602,15 @@ let cleaned = fixDataStringWithOptions(row.data || "");
     }
   }
 
+  // حدث البحث
   document.getElementById('clientSearch').addEventListener('input', e => {
     renderClientsList(e.target.value.trim());
   });
 
-  // إعداد القائمة المنسدلة للإعدادات
-  const settingsBtn = document.getElementById('settingsBtn');
-  const supportDropdown = document.getElementById('supportDropdown');
-
-  settingsBtn.addEventListener('click', () => {
-    supportDropdown.style.display = supportDropdown.style.display === 'block' ? 'none' : 'block';
-  });
-
-  // إخفاء القائمة عند الضغط خارجها
-  document.addEventListener('click', (e) => {
-    if (!settingsBtn.contains(e.target) && !supportDropdown.contains(e.target)) {
-      supportDropdown.style.display = 'none';
-    }
-  });
-
-  loadData();
-
-  // إظهار اسم المستخدم أو إعادة التوجيه
+  // تحقق من تسجيل الدخول
   const user = localStorage.getItem("loggedInUser");
   if (!user) {
-    window.location.href = "index.html"; // غيّر المسار إذا لزم
+    window.location.href = "index.html"; // عدّل الرابط حسب حاجتك
   } else {
     document.getElementById("user-info").textContent = "مرحبًا، " + user.split("@")[0];
   }
@@ -670,6 +619,9 @@ let cleaned = fixDataStringWithOptions(row.data || "");
     localStorage.removeItem("loggedInUser");
     window.location.href = "index.html";
   }
+
+  // بدء التحميل
+  loadData();
 </script>
 
 </body>
