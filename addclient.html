@@ -445,7 +445,7 @@ function createFormCards() {
   });
 }
 
-// دالة اختيار نموذج وفتحه في iframe
+// دالة اختيار نموذج وفتحه في iframe مع إضافة form_id كحقل مخفي في الرابط
 function selectForm(index) {
   const clientId = clientIdInput.value.trim();
   const clientName = clientNameInput.value.trim();
@@ -458,7 +458,8 @@ function selectForm(index) {
   localStorage.setItem("clientName", clientName);
   localStorage.setItem("clientId", clientId);
 
-  const url = `${forms[index].url}?client=${encodeURIComponent(clientName)}&id=${encodeURIComponent(clientId)}`;
+  // بناء الرابط مع client, id, و form_id
+  const url = `${forms[index].url}?client=${encodeURIComponent(clientName)}&id=${encodeURIComponent(clientId)}&form_id=${encodeURIComponent(forms[index].formId)}`;
   formFrame.src = url;
   formFrame.style.display = "block";
 
