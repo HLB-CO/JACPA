@@ -405,6 +405,7 @@
   let clientsData = {};
   let activeClient = null;
 
+  // تحويل نص data المعقد الى كائن مرتب
   function fixDataString(str) {
     try {
       let wrapped = str.trim();
@@ -437,6 +438,7 @@
     }
   }
 
+  // تجميع الردود حسب اسم العميل
   function groupDataByClient() {
     clientsData = {};
     rawData.forEach(row => {
@@ -455,11 +457,13 @@
       });
     });
 
+    // ترتيب الردود لكل عميل حسب التاريخ (الأحدث أول)
     for (let client in clientsData) {
       clientsData[client].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
     }
   }
 
+  // عرض قائمة العملاء مع البحث
   function renderClientsList(filter="") {
     const container = document.getElementById('clientsContainer');
     container.innerHTML = '';
@@ -494,6 +498,7 @@
     });
   }
 
+  // عرض تفاصيل الردود لكل عميل
   function renderClientDetails(client) {
     const panel = document.getElementById('detailsPanel');
     panel.innerHTML = `<h2>تفاصيل العميل: ${client}</h2>`;
@@ -542,6 +547,7 @@
     });
   }
 
+  // فتح نافذة طباعة مع تفاصيل الرد
   function printClientResponse(client, createdAt, dataObj) {
     const printWindow = window.open('', '_blank', 'width=800,height=600');
 
@@ -595,11 +601,12 @@
     }
   }
 
+  // ربط بحث العملاء بحقل البحث
   document.getElementById('clientSearch').addEventListener('input', e => {
     renderClientsList(e.target.value.trim());
   });
 
-  // إعداد القائمة المنسدلة للإعدادات
+  // القائمة المنسدلة للإعدادات
   const settingsBtn = document.getElementById('settingsBtn');
   const supportDropdown = document.getElementById('supportDropdown');
 
@@ -607,19 +614,19 @@
     supportDropdown.style.display = supportDropdown.style.display === 'block' ? 'none' : 'block';
   });
 
-  // إخفاء القائمة عند الضغط خارجها
   document.addEventListener('click', (e) => {
     if (!settingsBtn.contains(e.target) && !supportDropdown.contains(e.target)) {
       supportDropdown.style.display = 'none';
     }
   });
 
+  // تحميل البيانات عند بدء الصفحة
   loadData();
 
   // إظهار اسم المستخدم أو إعادة التوجيه
   const user = localStorage.getItem("loggedInUser");
   if (!user) {
-    window.location.href = "index.html"; // غيّر المسار إذا لزم
+    window.location.href = "index.html"; // غيّر الرابط حسب مشروعك
   } else {
     document.getElementById("user-info").textContent = "مرحبًا، " + user.split("@")[0];
   }
