@@ -409,23 +409,27 @@
   const result = {};
   if (!str) return result;
 
-  const matches = str.match(/\{[^}]+\}/g);
-  if (!matches) return result;
+  // ابحث عن كتل { label=..., value=... }
+  const regex = /\{([^}]+)\}/g;
+  let match;
 
-  matches.forEach(block => {
-    const content = block.slice(1, -1);
-    const pairs = content.split(',').map(p => p.trim());
+  while ((match = regex.exec(str)) !== null) {
+    const block = match[1]; // المحتوى داخل القوسين
+    const parts = block.split(',').map(p => p.trim());
+
     let label = '';
     let value = '';
 
-    pairs.forEach(pair => {
-      const [key, val] = pair.split('=').map(s => s.trim());
+    parts.forEach(part => {
+      const [key, val] = part.split('=').map(s => s.trim());
       if (key === 'label') label = val.replace(/^"|"$/g, '');
       else if (key === 'value') value = val.replace(/^"|"$/g, '');
     });
 
-    if (label) result[label] = value;
-  });
+    if (label) {
+      result[label] = value;
+    }
+  }
 
   return result;
 }
