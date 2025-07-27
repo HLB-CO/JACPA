@@ -399,42 +399,42 @@
 <script>
   const SHEET_ID = "1oJoFsYqk0KAMeNSIzPVe82FqY0q__KEsWH3DJbId-YY";
   const SHEET_NAME = "Sheet1";
-  const SHEET_URL = `https://opensheet.elk.sh/${SHEET_ID}/${SHEET_NAME}`;
+  const SHEET_URL = https://opensheet.elk.sh/${SHEET_ID}/${SHEET_NAME};
 
   let rawData = [];
   let clientsData = {};
   let activeClient = null;
 
-  // دالة لتحويل الحقول من array لكائن مع استبدال UUID بالنص الصحيح
-  function parseFields(fieldsArray) {
-    const result = {};
-    fieldsArray.forEach(field => {
-      let value = field.value;
+  function fixDataString(str) {
+  const result = {};
+  if (!str) return result;
 
-      // لو في خيارات، نحول UUID إلى نص
-      if (field.options && Array.isArray(field.options)) {
-        const foundOption = field.options.find(opt => opt.id === value);
-        if (foundOption) {
-          value = foundOption.text;
-        }
-      }
+  const matches = str.match(/\{[^}]+\}/g);
+  if (!matches) return result;
 
-      // تنظيف لابل ونزع النقطتين
-      let label = field.label.trim();
-      if (label.endsWith(':')) label = label.slice(0, -1);
+  matches.forEach(block => {
+    const content = block.slice(1, -1);
+    const pairs = content.split(',').map(p => p.trim());
+    let label = '';
+    let value = '';
 
-      result[label] = (value === null || value === undefined) ? '-' : value;
+    pairs.forEach(pair => {
+      const [key, val] = pair.split('=').map(s => s.trim());
+      if (key === 'label') label = val.replace(/^"|"$/g, '');
+      else if (key === 'value') value = val.replace(/^"|"$/g, '');
     });
-    return result;
-  }
 
-  // بناء وتجميع البيانات حسب العميل
+    if (label) result[label] = value;
+  });
+
+  return result;
+}
+
   function groupDataByClient() {
     clientsData = {};
     rawData.forEach(row => {
-      // استخدم parseFields على row.fields مباشرة
-      const cleaned = parseFields(row.fields || []);
-      let clientName = cleaned['client'] || cleaned['إسم العميل'] || cleaned['اسم العميل'] || null;
+      let cleaned = fixDataString(row.data || "");
+      let clientName = cleaned['client'] || cleaned['اسم العميل'] || null;
       if (!clientName) return;
 
       let createdAt = row.createdAt || "";
@@ -448,13 +448,11 @@
       });
     });
 
-    // ترتيب الردود من الأحدث للأقدم
     for (let client in clientsData) {
       clientsData[client].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
     }
   }
 
-  // عرض قائمة العملاء مع فلتر البحث
   function renderClientsList(filter="") {
     const container = document.getElementById('clientsContainer');
     container.innerHTML = '';
@@ -477,8 +475,9 @@
       div.className = 'client-item';
       if(client === activeClient) div.classList.add('active');
       div.innerHTML = 
-        `<span class="client-name">${client}</span>
-        <span class="client-date">${latestDate ? new Date(latestDate).toLocaleString('ar-EG') : '-'}</span>`;
+        <span class="client-name">${client}</span>
+        <span class="client-date">${latestDate ? new Date(latestDate).toLocaleString('ar-EG') : '-'}</span>
+      ;
       div.onclick = () => {
         activeClient = client;
         renderClientsList(document.getElementById('clientSearch').value.trim());
@@ -488,15 +487,14 @@
     });
   }
 
-  // عرض تفاصيل العميل مع زر طباعة لكل رد
   function renderClientDetails(client) {
     const panel = document.getElementById('detailsPanel');
-    panel.innerHTML = `<h2>تفاصيل العميل: ${client}</h2>`;
+    panel.innerHTML = <h2>تفاصيل العميل: ${client}</h2>;
 
     let responses = clientsData[client] || [];
 
     if(responses.length === 0){
-      panel.innerHTML += `<p>لا توجد بيانات لهذا العميل.</p>`;
+      panel.innerHTML += <p>لا توجد بيانات لهذا العميل.</p>;
       return;
     }
 
@@ -537,14 +535,13 @@
     });
   }
 
-  // طباعة بيانات الرد كصفحة جديدة (يمكن طباعتها أو حفظها PDF من المتصفح)
   function printClientResponse(client, createdAt, dataObj) {
     const printWindow = window.open('', '_blank', 'width=800,height=600');
 
     const formattedDate = createdAt ? new Date(createdAt).toLocaleString('ar-EG') : '-';
 
     let html = 
-      `<html lang="ar" dir="rtl">
+      <html lang="ar" dir="rtl">
       <head>
         <title>تفاصيل العميل: ${client}</title>
         <style>
@@ -561,24 +558,25 @@
       </head>
       <body>
         <h1>تفاصيل العميل: ${client}</h1>
-        <p><strong>التاريخ:</strong> ${formattedDate}</p>`;
+        <p><strong>التاريخ:</strong> ${formattedDate}</p>
+    ;
 
     for (const [label, valueRaw] of Object.entries(dataObj)) {
       const value = valueRaw === undefined || valueRaw === null ? '-' : valueRaw.toString();
       html += 
-        `<div class="field">
+        <div class="field">
           <div class="label">${label}</div>
           <div class="value">${value}</div>
-        </div>`;
+        </div>
+      ;
     }
 
-    html += `<button onclick="window.print()">طباعة الصفحة</button></body></html>`;
+    html += <button onclick="window.print()">طباعة الصفحة</button></body></html>;
 
     printWindow.document.write(html);
     printWindow.document.close();
   }
 
-  // جلب البيانات من Google Sheet وتجهيزها للعرض
   async function loadData() {
     try {
       rawData = await fetch(SHEET_URL).then(r => r.json());
@@ -590,7 +588,6 @@
     }
   }
 
-  // حدث فلترة البحث حسب نص المستخدم
   document.getElementById('clientSearch').addEventListener('input', e => {
     renderClientsList(e.target.value.trim());
   });
@@ -620,12 +617,12 @@
     document.getElementById("user-info").textContent = "مرحبًا، " + user.split("@")[0];
   }
 
-  // دالة تسجيل الخروج
   function logout() {
     localStorage.removeItem("loggedInUser");
     window.location.href = "index.html";
   }
 </script>
+  
 
 </body>
 </html>
