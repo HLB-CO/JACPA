@@ -685,6 +685,11 @@ if (typeof value === "string" && value.includes("http")) {
     localStorage.removeItem("loggedInUser");
     window.location.href = "index.html";
   }
+  function linkify(text) {
+  const urlRegex = /(https?:\/\/[^\s)]+)/g; // عدلنا الاستثناء ليشمل نهاية القوس
+  return text.replace(urlRegex, url => `<a href="${url}" target="_blank" rel="noopener noreferrer">رابط الملف</a>`);
+}
+
 </script>
 
 </body>
