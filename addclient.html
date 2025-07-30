@@ -19,7 +19,24 @@
       align-items: center;
       padding: 30px;
     }
+    ::-webkit-scrollbar {
+      width: 12px;
+    }
 
+    ::-webkit-scrollbar-track {
+      background: #eeeeee;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: #2b4c7e;
+      border-radius: 6px;
+      transition: background-color 0.3s ease;
+    }
+
+    ::-webkit-scrollbar-thumb:hover,
+    ::-webkit-scrollbar-thumb:active {
+      background-color: #6b4b4b;
+    }
     /* Header/Navbar Styles */
     .dashboard-header {
       display: flex;
