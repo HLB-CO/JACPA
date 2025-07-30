@@ -551,23 +551,32 @@
         const valueEl = document.createElement('span');
 if (typeof value === "string" && value.includes("http")) {
   const match = value.match(/^(.*?)\s*\(([^:]+):\s*(https?:\/\/[^\)]+)\)/);
-  
+
   if (match && match.length === 4) {
-    const mainText = match[1].trim();   // النص قبل الرابط
-    const fileName = match[2].trim();   // اسم الملف
-    const fileUrl = match[3].trim();    // الرابط
+    const mainText = match[1].trim();
+    const fileName = match[2].trim();
+    const fileUrl = match[3].trim();
 
     valueEl.innerHTML = `
       <span>${mainText}</span><br>
       <a href="${fileUrl}" target="_blank" style="color:#1e40af; font-weight:600;">📎 ${fileName}</a>
     `;
   } else {
-    // إذا فشل regex، نعرض القيمة كما هي بدون كسر
-    valueEl.textContent = value;
-  }
+    // فشل regex → نبحث عن أول رابط داخل النص ونعرضه
+    const urlMatch = value.match(/https?:\/\/[^\s)]+/g);
 
+    if (urlMatch && urlMatch.length > 0) {
+      const rawUrl = urlMatch[0];
+      valueEl.innerHTML = `
+        <a href="${rawUrl}" target="_blank" style="color:#1e40af; font-weight:600;">📎 فتح الرابط</a>
+        <br><small style="color:#64748b;">(تم استخراج الرابط تلقائيًا)</small>
+      `;
+    } else {
+      // ما فيه ولا رابط، نعرض النص كما هو
+      valueEl.textContent = value;
+    }
+  }
 } else {
-  // للقيم اللي ما فيها روابط
   valueEl.textContent = value || '-';
 }
 
