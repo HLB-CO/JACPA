@@ -422,37 +422,47 @@
   let clientsData = {};
   let activeClient = null;
 
-  function fixDataString(str) {
-    try {
-      let wrapped = str.trim();
-      if (!wrapped.startsWith('{')) wrapped = '{' + wrapped + '}';
+function fixDataString(str) {
+  try {
+    // ✅ تصليح الخطأ الأساسي: استبدال "" بـ "
+    let wrapped = str.trim().replace(/""/g, '"');
 
-      let items = [...wrapped.matchAll(/\{([^{}]*?)\}/g)];
-      let result = {};
+    // تأكد من وجود الأقواس {} حول النص
+    if (!wrapped.startsWith('{')) wrapped = '{' + wrapped + '}';
 
-      items.forEach(match => {
-        let content = match[1];
-        let jsonLike = '{' + content
-          .replace(/(\w+)=/g, '"$1":')
-          .replace(/:null/g, ':""')
-          .replace(/:([^{},]+)(,|$)/g, (m,p1,p2) => {
-            let v = p1.trim();
-            if(/^".*"$/.test(v) || /^'.*'$/.test(v)) return ':' + v + p2;
-            return ':' + JSON.stringify(v) + p2;
-          }) + '}';
-        try {
-          let obj = JSON.parse(jsonLike);
-          if(obj.label && obj.value !== undefined){
-            result[obj.label.trim()] = obj.value;
-          }
-        } catch(e) {}
-      });
+    let items = [...wrapped.matchAll(/\{([^{}]*?)\}/g)];
+    let result = {};
 
-      return result;
-    } catch (e) {
-      return {};
-    }
+    items.forEach(match => {
+      let content = match[1];
+
+      // تحويل النص لصيغة JSON قابلة للقراءة
+      let jsonLike = '{' + content
+        .replace(/(\w+)=/g, '"$1":')                // تحويل المفتاح إلى صيغة "key":
+        .replace(/:null/g, ':""')                   // null إلى سلسلة فارغة
+        .replace(/:([^{},]+)(,|$)/g, (m, p1, p2) => {
+          let v = p1.trim();
+          if (/^".*"$/.test(v) || /^'.*'$/.test(v)) return ':' + v + p2;
+          return ':' + JSON.stringify(v) + p2;
+        }) + '}';
+
+      try {
+        let obj = JSON.parse(jsonLike);
+        if (obj.label && obj.value !== undefined) {
+          result[obj.label.trim()] = obj.value;
+        }
+      } catch (e) {
+        console.warn("فشل في تحويل العنصر:", jsonLike, e);
+      }
+    });
+
+    return result;
+  } catch (e) {
+    console.error("فشل في معالجة السلسلة:", str, e);
+    return {};
   }
+}
+
 
   function groupDataByClient() {
     clientsData = {};
