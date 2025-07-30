@@ -550,13 +550,23 @@
         labelEl.textContent = label;
         const valueEl = document.createElement('span');
 if (typeof value === "string" && value.includes("http")) {
-  // إذا كانت القيمة تحتوي على رابط، نعرضها كرابط
-  const linkMatch = value.match(/(https?:\/\/[^\s)]+)/);
-  const linkText = value.replace(/ *\(.*?\)/g, '').trim(); // إزالة الجزء بين الأقواس
-  valueEl.innerHTML = `<span>${linkText}</span><br><a href="${linkMatch[1]}" target="_blank" style="color:#1e40af; font-weight:600;">رابط المرفق</a>`;
+  const match = value.match(/^(.*?)\s*\(([^:]+):\s*(https?:\/\/[^\)]+)\)/);
+  if (match) {
+    const mainText = match[1].trim();         // النص قبل القوس
+    const fileName = match[2].trim();         // اسم الملف A.pdf
+    const fileUrl = match[3].trim();          // الرابط الكامل
+
+    valueEl.innerHTML = `
+      <span>${mainText}</span><br>
+      <a href="${fileUrl}" target="_blank" style="color:#1e40af; font-weight:600;">📎 ${fileName}</a>
+    `;
+  } else {
+    valueEl.textContent = value;
+  }
 } else {
   valueEl.textContent = value || '-';
 }
+
         fieldDiv.appendChild(labelEl);
         fieldDiv.appendChild(valueEl);
         card.appendChild(fieldDiv);
