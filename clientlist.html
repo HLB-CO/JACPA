@@ -422,47 +422,37 @@
   let clientsData = {};
   let activeClient = null;
 
-function fixDataString(str) {
-  try {
-    // ✅ تصليح الخطأ الأساسي: استبدال "" بـ "
-    let wrapped = str.trim().replace(/""/g, '"');
-
-    // تأكد من وجود الأقواس {} حول النص
-    if (!wrapped.startsWith('{')) wrapped = '{' + wrapped + '}';
-
-    let items = [...wrapped.matchAll(/\{([^{}]*?)\}/g)];
-    let result = {};
-
-    items.forEach(match => {
-      let content = match[1];
-
-      // تحويل النص لصيغة JSON قابلة للقراءة
-      let jsonLike = '{' + content
-        .replace(/(\w+)=/g, '"$1":')                // تحويل المفتاح إلى صيغة "key":
-        .replace(/:null/g, ':""')                   // null إلى سلسلة فارغة
-        .replace(/:([^{},]+)(,|$)/g, (m, p1, p2) => {
-          let v = p1.trim();
-          if (/^".*"$/.test(v) || /^'.*'$/.test(v)) return ':' + v + p2;
-          return ':' + JSON.stringify(v) + p2;
-        }) + '}';
-
-      try {
-        let obj = JSON.parse(jsonLike);
-        if (obj.label && obj.value !== undefined) {
-          result[obj.label.trim()] = obj.value;
+  function fixDataString(str) {
+    try {
+      let wrapped = str.trim().replace(/""/g, '"');
+      if (!wrapped.startsWith('{')) wrapped = '{' + wrapped + '}';
+      let items = [...wrapped.matchAll(/\{([^{}]*?)\}/g)];
+      let result = {};
+      items.forEach(match => {
+        let content = match[1];
+        let jsonLike = '{' + content
+          .replace(/(\w+)=/g, '"$1":')
+          .replace(/:null/g, ':""')
+          .replace(/:([^{},]+)(,|$)/g, (m, p1, p2) => {
+            let v = p1.trim();
+            if (/^".*"$/.test(v) || /^'.*'$/.test(v)) return ':' + v + p2;
+            return ':' + JSON.stringify(v) + p2;
+          }) + '}';
+        try {
+          let obj = JSON.parse(jsonLike);
+          if (obj.label && obj.value !== undefined) {
+            result[obj.label.trim()] = obj.value;
+          }
+        } catch (e) {
+          console.warn("فشل في تحويل العنصر:", jsonLike, e);
         }
-      } catch (e) {
-        console.warn("فشل في تحويل العنصر:", jsonLike, e);
-      }
-    });
-
-    return result;
-  } catch (e) {
-    console.error("فشل في معالجة السلسلة:", str, e);
-    return {};
+      });
+      return result;
+    } catch (e) {
+      console.error("فشل في معالجة السلسلة:", str, e);
+      return {};
+    }
   }
-}
-
 
   function groupDataByClient() {
     clientsData = {};
@@ -470,44 +460,37 @@ function fixDataString(str) {
       let cleaned = fixDataString(row.data || "");
       let clientName = cleaned['client'] || cleaned['اسم العميل'] || null;
       if (!clientName) return;
-
       let createdAt = row.createdAt || "";
-
       if (!clientsData[clientName]) clientsData[clientName] = [];
-
       clientsData[clientName].push({
         createdAt,
         dataRaw: row.data || "",
         cleanedData: cleaned
       });
     });
-
     for (let client in clientsData) {
-      clientsData[client].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+      clientsData[client].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     }
   }
 
-  function renderClientsList(filter="") {
+  function renderClientsList(filter = "") {
     const container = document.getElementById('clientsContainer');
     container.innerHTML = '';
-
     let entries = Object.entries(clientsData)
       .map(([client, responses]) => ({
         client,
         latestDate: responses.length > 0 ? responses[0].createdAt : ""
       }))
       .filter(e => e.client.toLowerCase().includes(filter.toLowerCase()))
-      .sort((a,b) => new Date(b.latestDate) - new Date(a.latestDate));
-
-    if(entries.length === 0){
+      .sort((a, b) => new Date(b.latestDate) - new Date(a.latestDate));
+    if (entries.length === 0) {
       container.innerHTML = '<p style="color:#64748b; text-align:center; margin-top:30px;">لا يوجد عملاء مطابقة للبحث.</p>';
       return;
     }
-
-    entries.forEach(({client, latestDate}) => {
+    entries.forEach(({ client, latestDate }) => {
       let div = document.createElement('div');
       div.className = 'client-item';
-      if(client === activeClient) div.classList.add('active');
+      if (client === activeClient) div.classList.add('active');
       div.innerHTML = `
         <span class="client-name">${client}</span>
         <span class="client-date">${latestDate ? new Date(latestDate).toLocaleString('ar-EG') : '-'}</span>
@@ -524,86 +507,55 @@ function fixDataString(str) {
   function renderClientDetails(client) {
     const panel = document.getElementById('detailsPanel');
     panel.innerHTML = `<h2>تفاصيل العميل: ${client}</h2>`;
-
     let responses = clientsData[client] || [];
-
-    if(responses.length === 0){
+    if (responses.length === 0) {
       panel.innerHTML += `<p>لا توجد بيانات لهذا العميل.</p>`;
       return;
     }
-
     responses.forEach((resp) => {
       const card = document.createElement('div');
       card.className = 'response-card';
-
       const header = document.createElement('div');
       header.className = 'response-header';
-
       const dateSpan = document.createElement('div');
       dateSpan.className = 'date';
       dateSpan.textContent = resp.createdAt ? new Date(resp.createdAt).toLocaleString('ar-EG') : '-';
-
       const downloadBtn = document.createElement('button');
       downloadBtn.className = 'download-pdf';
       downloadBtn.title = "طباعة تفاصيل هذا الرد";
       downloadBtn.textContent = 'طباعة التفاصيل';
       downloadBtn.onclick = () => printClientResponse(client, resp.createdAt, resp.cleanedData);
-
       header.appendChild(dateSpan);
       header.appendChild(downloadBtn);
-
       card.appendChild(header);
-
       Object.entries(resp.cleanedData).forEach(([label, value]) => {
         const fieldDiv = document.createElement('div');
         const labelEl = document.createElement('label');
         labelEl.textContent = label;
         const valueEl = document.createElement('span');
-if (typeof value === "string" && value.includes("http")) {
-  const match = value.match(/^(.*?)\s*\(([^:]+):\s*(https?:\/\/[^\)]+)\)/);
-
-  if (match && match.length === 4) {
-    const mainText = match[1].trim();
-    const fileName = match[2].trim();
-    const fileUrl = match[3].trim();
-
-    valueEl.innerHTML = `
-      <span>${mainText}</span><br>
-      <a href="${fileUrl}" target="_blank" style="color:#1e40af; font-weight:600;">📎 ${fileName}</a>
-    `;
-  } else {
-    // فشل regex → نبحث عن أول رابط داخل النص ونعرضه
-    const urlMatch = value.match(/https?:\/\/[^\s)]+/g);
-
-    if (urlMatch && urlMatch.length > 0) {
-      const rawUrl = urlMatch[0];
-      valueEl.innerHTML = `
-        <a href="${rawUrl}" target="_blank" style="color:#1e40af; font-weight:600;">📎 فتح الرابط</a>
-        <br><small style="color:#64748b;">(تم استخراج الرابط تلقائيًا)</small>
-      `;
-    } else {
-      // ما فيه ولا رابط، نعرض النص كما هو
-      valueEl.textContent = value;
-    }
-  }
-} else {
-  valueEl.textContent = value || '-';
-}
-
+        if (typeof value === "string" && value.includes("http")) {
+          valueEl.innerHTML = linkifySmart(value);
+        } else {
+          valueEl.textContent = value || '-';
+        }
         fieldDiv.appendChild(labelEl);
         fieldDiv.appendChild(valueEl);
         card.appendChild(fieldDiv);
       });
-
       panel.appendChild(card);
+    });
+  }
+
+  function linkifySmart(text) {
+    const urlRegex = /(https?:\/\/[^\s")]+)/g;
+    return text.replace(urlRegex, (url) => {
+      return `<a href="${url}" target="_blank" style="color:#1e40af; font-weight:600;">📎 فتح الرابط</a>`;
     });
   }
 
   function printClientResponse(client, createdAt, dataObj) {
     const printWindow = window.open('', '_blank', 'width=800,height=600');
-
     const formattedDate = createdAt ? new Date(createdAt).toLocaleString('ar-EG') : '-';
-
     let html = `
       <html lang="ar" dir="rtl">
       <head>
@@ -624,7 +576,6 @@ if (typeof value === "string" && value.includes("http")) {
         <h1>تفاصيل العميل: ${client}</h1>
         <p><strong>التاريخ:</strong> ${formattedDate}</p>
     `;
-
     for (const [label, valueRaw] of Object.entries(dataObj)) {
       const value = valueRaw === undefined || valueRaw === null ? '-' : valueRaw.toString();
       html += `
@@ -634,9 +585,7 @@ if (typeof value === "string" && value.includes("http")) {
         </div>
       `;
     }
-
     html += `<button onclick="window.print()">طباعة الصفحة</button></body></html>`;
-
     printWindow.document.write(html);
     printWindow.document.close();
   }
@@ -656,15 +605,11 @@ if (typeof value === "string" && value.includes("http")) {
     renderClientsList(e.target.value.trim());
   });
 
-  // إعداد القائمة المنسدلة للإعدادات
   const settingsBtn = document.getElementById('settingsBtn');
   const supportDropdown = document.getElementById('supportDropdown');
-
   settingsBtn.addEventListener('click', () => {
     supportDropdown.style.display = supportDropdown.style.display === 'block' ? 'none' : 'block';
   });
-
-  // إخفاء القائمة عند الضغط خارجها
   document.addEventListener('click', (e) => {
     if (!settingsBtn.contains(e.target) && !supportDropdown.contains(e.target)) {
       supportDropdown.style.display = 'none';
@@ -673,10 +618,9 @@ if (typeof value === "string" && value.includes("http")) {
 
   loadData();
 
-  // إظهار اسم المستخدم أو إعادة التوجيه
   const user = localStorage.getItem("loggedInUser");
   if (!user) {
-    window.location.href = "index.html"; // غيّر المسار إذا لزم
+    window.location.href = "index.html";
   } else {
     document.getElementById("user-info").textContent = "مرحبًا، " + user.split("@")[0];
   }
@@ -685,12 +629,9 @@ if (typeof value === "string" && value.includes("http")) {
     localStorage.removeItem("loggedInUser");
     window.location.href = "index.html";
   }
-  function linkify(text) {
-  const urlRegex = /(https?:\/\/[^\s)]+)/g; // عدلنا الاستثناء ليشمل نهاية القوس
-  return text.replace(urlRegex, url => `<a href="${url}" target="_blank" rel="noopener noreferrer">رابط الملف</a>`);
-}
-
 </script>
+
 
 </body>
 </html>
+
