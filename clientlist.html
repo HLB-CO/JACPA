@@ -546,12 +546,14 @@
     });
   }
 
-  function linkifySmart(text) {
-    const urlRegex = /(https?:\/\/[^\s")]+)/g;
-    return text.replace(urlRegex, (url) => {
-      return `<a href="${url}" target="_blank" style="color:#1e40af; font-weight:600;">📎 فتح الرابط</a>`;
-    });
-  }
+function linkifySmart(text) {
+  // التعبير النمطي يلتقط روابط http و https بدون علامات اقتباس أو فراغ
+  const urlRegex = /(https?:\/\/[^\s")]+)/g;
+  return text.replace(urlRegex, (url) => {
+    return `<a href="${url}" target="_blank" style="color:#1e40af; font-weight:600;">📎 فتح الرابط</a>`;
+  });
+}
+
 
   function printClientResponse(client, createdAt, dataObj) {
     const printWindow = window.open('', '_blank', 'width=800,height=600');
@@ -634,4 +636,5 @@
 
 </body>
 </html>
+
 
