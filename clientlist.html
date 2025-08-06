@@ -646,56 +646,45 @@ function linkifySmart(text) {
     localStorage.removeItem("loggedInUser");
     window.location.href = "index.html";
   }
-  <script>
 document.addEventListener('DOMContentLoaded', function () {
-  // ========== 1. تفعيل العميل عند الضغط ==========
+  // 1. تفعيل العنصر من قائمة العملاء
   const clientItems = document.querySelectorAll('.client-item');
   clientItems.forEach(item => {
     item.addEventListener('click', () => {
       clientItems.forEach(i => i.classList.remove('active'));
       item.classList.add('active');
-
-      // تأثير تمرين (اختياري): تمرير تلقائي لعرض التفاصيل
-      const detailsPanel = document.getElementById('detailsPanel');
-      if (detailsPanel) {
-        detailsPanel.scrollIntoView({ behavior: 'smooth' });
-      }
     });
   });
 
-  // ========== 2. فلترة العملاء عند الكتابة ==========
+  // 2. فلترة العملاء
   const searchInput = document.getElementById('clientSearch');
   if (searchInput) {
     searchInput.addEventListener('input', function () {
       const filter = this.value.toLowerCase();
       clientItems.forEach(item => {
-        const name = item.querySelector('.client-name').textContent.toLowerCase();
+        const name = item.querySelector('.client-name')?.textContent.toLowerCase() || '';
         item.style.display = name.includes(filter) ? 'flex' : 'none';
       });
     });
   }
 
-  // ========== 3. القائمة المنسدلة للدعم ==========
+  // 3. القائمة المنسدلة (الدعم أو الاعدادات)
   const supportBtn = document.querySelector('.header-actions button');
   const supportDropdown = document.querySelector('.support-dropdown');
-
   if (supportBtn && supportDropdown) {
     supportBtn.addEventListener('click', function (e) {
       e.stopPropagation();
-      supportDropdown.style.display = supportDropdown.style.display === 'block' ? 'none' : 'block';
+      supportDropdown.classList.toggle('open');
+      supportDropdown.style.display = supportDropdown.classList.contains('open') ? 'block' : 'none';
     });
 
-    // اغلاق القائمة عند الضغط خارجها
-    document.addEventListener('click', function () {
+    document.addEventListener('click', () => {
+      supportDropdown.classList.remove('open');
       supportDropdown.style.display = 'none';
-    });
-
-    supportDropdown.addEventListener('click', function (e) {
-      e.stopPropagation();
     });
   }
 
-  // ========== 4. تحميل PDF / طباعة ==========
+  // 4. زر تحميل PDF (طباعة)
   const downloadBtn = document.querySelector('.download-pdf');
   if (downloadBtn) {
     downloadBtn.addEventListener('click', () => {
@@ -703,35 +692,31 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // ========== 5. تأثير الظهور عند التمرير (Intersection Observer) ==========
-  const observerOptions = {
-    root: null,
-    rootMargin: '0px',
-    threshold: 0.1
-  };
-
-  const animateOnScroll = (entries, observer) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.style.opacity = 1;
-        entry.target.style.transform = 'translateY(0)';
-        observer.unobserve(entry.target);
+  // 5. ظهور بسيط عند التمرير (خفيف بدون Observer)
+  const animatedItems = document.querySelectorAll('.client-item, .response-card');
+  const revealOnScroll = () => {
+    animatedItems.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight - 50) {
+        el.style.opacity = 1;
+        el.style.transform = 'translateY(0)';
       }
     });
   };
 
-  const observer = new IntersectionObserver(animateOnScroll, observerOptions);
-
-  document.querySelectorAll('.client-item, .response-card').forEach(el => {
+  // إعداد مبدئي
+  animatedItems.forEach(el => {
     el.style.opacity = 0;
     el.style.transform = 'translateY(20px)';
-    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-    observer.observe(el);
+    el.style.transition = 'all 0.5s ease';
   });
+
+  // تفعيل عند التمرير
+  window.addEventListener('scroll', revealOnScroll);
+  revealOnScroll(); // عند أول تحميل
 });
 </script>
+
 </body>
 </html>
-
-
 
