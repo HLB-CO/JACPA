@@ -187,21 +187,38 @@ html, body {
       box-shadow: 0 0 8px rgba(26, 35, 126, 0.4);
     }
 
-    #addClientBtn {
-      background: #1a237e;
-      color: #fff;
-      font-weight: bold;
-      border: none;
-      border-radius: 10px;
-      padding: 10px 20px;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(26, 35, 126, 0.5);
-      transition: 0.3s;
-    }
+#addClientBtn {
+  background: #1a237e;
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(26, 35, 126, 0.5);
+  transition: 0.3s;
+}
+#addClientBtn:hover {
+  background: #283593;
+}
 
-    #addClientBtn:hover {
-      background: #283593;
-    }
+#changeClientBtn {
+  margin-top: 15px;
+  background: #d32f2f;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(211, 47, 47, 0.5);
+  display: none;
+  align-self: flex-start;
+  transition: 0.3s;
+}
+#changeClientBtn:hover {
+  background: #b71c1c;
+}
 
     #mainContainer {
       display: flex;
@@ -298,24 +315,7 @@ html, body {
       border-radius: 6px;
     }
 
-    #changeClientBtn {
-      margin-top: 15px;
-      background: #d32f2f;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      padding: 10px 18px;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(211, 47, 47, 0.5);
-      display: none;
-      align-self: flex-start;
-      transition: 0.3s;
-    }
-
-    #changeClientBtn:hover {
-      background: #b71c1c;
-    }
+    
   </style>
 </head>
 <body>
@@ -326,7 +326,7 @@ html, body {
     </div>
 
     <nav class="nav-links">
-      <a href="addclient.html" class="nav-link" id="addClientLink">Add Client</a>
+      <a href="add.html" class="nav-link" id="addClientLink">Add Client</a>
       <a href="clientlist.html" class="nav-link active" id="clientListLink">Client List</a>
     </nav>
 
@@ -351,9 +351,10 @@ html, body {
   <h2>Enter Client Name to View Forms</h2>
 
   <div class="input-group" id="inputGroup">
-<input type="text" id="clientId" placeholder="Client Number" autocomplete="off" style="width: 40%;" />
 <input type="text" id="clientName" placeholder="Client Name" autocomplete="off" style="width: 60%;" />
-    <button id="addClientBtn" onclick="showForms()">Add Client</button>
+<input type="text" id="clientId" placeholder="Client Number" autocomplete="off" style="width: 40%;" />
+<input type="text" id="employeeName" placeholder="Employee Name" autocomplete="off" style="width: 60%;" />
+<button id="addClientBtn" onclick="showForms()">Add Client</button>
   </div>
 
   <div id="mainContainer">
@@ -475,6 +476,7 @@ function createFormCards() {
 function selectForm(index) {
   const clientId = clientIdInput.value.trim();
   const clientName = clientNameInput.value.trim();
+  const employeeName = document.getElementById("employeeName").value.trim(); // ✅
 
   if (!clientId || !clientName) {
     alert("يرجى إدخال اسم العميل ورقم العميل أولاً.");
@@ -483,13 +485,12 @@ function selectForm(index) {
 
   localStorage.setItem("clientName", clientName);
   localStorage.setItem("clientId", clientId);
+  localStorage.setItem("employeeName", employeeName); // ✅
 
-  // بناء الرابط مع client, id, و form_id
-  const url = `${forms[index].url}?client=${encodeURIComponent(clientName)}&id=${encodeURIComponent(clientId)}&form_id=${encodeURIComponent(forms[index].formId)}`;
+const url = `${forms[index].url}?client=${encodeURIComponent(clientName)}&id=${encodeURIComponent(clientId)}&form_id=${encodeURIComponent(forms[index].formId)}&employee=${encodeURIComponent(employeeName)}`;
   formFrame.src = url;
   formFrame.style.display = "block";
 
-  // تحديث اختيار البطاقة النشطة بصرياً
   const formCards = document.querySelectorAll(".formCard");
   formCards.forEach(card => card.classList.remove("selected"));
   formCards[index].classList.add("selected");
@@ -497,23 +498,29 @@ function selectForm(index) {
   selectedFormIndex = index;
 }
 
+
 // عرض النماذج بعد الضغط على زر "Add Client"
 function showForms() {
   const clientId = clientIdInput.value.trim();
   const clientName = clientNameInput.value.trim();
+  const employeeName = document.getElementById("employeeName").value.trim(); // 👈
 
-  if (!clientName || !clientId) {
-    alert("يرجى إدخال اسم العميل ورقم العميل.");
+  if (!clientName || !clientId || !employeeName) {
+    alert("يرجى إدخال اسم العميل، رقم العميل، واسم الموظف.");
     return;
   }
 
   localStorage.setItem("clientName", clientName);
   localStorage.setItem("clientId", clientId);
+  localStorage.setItem("employeeName", employeeName); // 👈
 
   inputGroup.style.display = "none";
   formsGrid.style.display = "block";
   selectedClientNameDiv.style.display = "block";
-  selectedClientNameDiv.textContent = `العميل: ${clientName} (الرقم: ${clientId})`;
+
+  // ✅ هذا هو السطر المعدل:
+  selectedClientNameDiv.textContent = `العميل: ${clientName} (الرقم: ${clientId}) - الموظف: ${employeeName}`;
+
   changeClientBtn.style.display = "inline-block";
 
   createFormCards();
@@ -535,6 +542,9 @@ function changeClient() {
   selectedFormIndex = null;
   localStorage.removeItem("clientName");
   localStorage.removeItem("clientId");
+  document.getElementById("employeeName").value = "";
+localStorage.removeItem("employeeName");
+
 }
 
 // تسجيل الخروج
@@ -577,6 +587,7 @@ function init() {
 
   const storedName = localStorage.getItem("clientName");
   const storedId = localStorage.getItem("clientId");
+  const storedEmployee = localStorage.getItem("employeeName");
 
   if (storedName && storedId) {
     clientNameInput.value = storedName;
@@ -585,12 +596,19 @@ function init() {
     inputGroup.style.display = "none";
     formsGrid.style.display = "block";
     selectedClientNameDiv.style.display = "block";
-    selectedClientNameDiv.textContent = `العميل: ${storedName} (الرقم: ${storedId})`;
+selectedClientNameDiv.textContent = `العميل: ${storedName} (الرقم: ${storedId}) - الموظف: ${storedEmployee || ""}`;
     changeClientBtn.style.display = "inline-block";
+
+    if (storedEmployee) {
+      document.getElementById("employeeName").value = storedEmployee;
+    }
 
     createFormCards();
   } else {
     changeClient();
+    if (storedEmployee) {
+      document.getElementById("employeeName").value = storedEmployee;
+    }
   }
 }
 
@@ -679,3 +697,4 @@ document.addEventListener("DOMContentLoaded", init);
 </script>
 
 </html>
+
