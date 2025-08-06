@@ -165,7 +165,7 @@ html, body {
 
     .input-group {
       width: 100%;
-      max-width: 500px;
+      max-width: 1000px;
       display: flex;
       gap: 12px;
       margin-bottom: 25px;
@@ -314,6 +314,19 @@ html, body {
       background: #1a237e88;
       border-radius: 6px;
     }
+/* الحالة الابتدائية لكل العناصر */
+.pre-animate {
+  opacity: 0;
+  transform: translateY(80px) scale(0.9);
+  transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+/* عند الظهور */
+.animate-slide-fade {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
 
     
   </style>
@@ -692,6 +705,60 @@ document.addEventListener("DOMContentLoaded", init);
     `;
     document.head.appendChild(style);
   });
+  function animateAllOnScroll() {
+  const elements = document.querySelectorAll(
+    "section, header, footer, article, aside, div, img, p, h1, h2, h3, h4, h5, h6, ul, li, button, form, input, textarea, .card, .container"
+  );
+
+  const observer = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("animate-slide-fade");
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {
+    threshold: 0.15
+  });
+
+  elements.forEach(el => {
+    el.classList.add("pre-animate");
+    observer.observe(el);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", animateAllOnScroll);
+function loadAllFormsFast(forms, containerSelector) {
+  const container = document.querySelector(containerSelector);
+  if (!container) return console.error("Container not found");
+
+  // مسح المحتوى الحالي
+  container.innerHTML = "";
+
+  // ننشئ iframes لكل فورم دفعة وحدة
+  forms.forEach(({ formId, url, title }) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "form-wrapper";
+    wrapper.style.marginBottom = "20px";
+
+    const titleEl = document.createElement("h3");
+    titleEl.textContent = title;
+
+    const iframe = document.createElement("iframe");
+    iframe.src = url;
+    iframe.width = "100%";
+    iframe.height = "600"; // عدّل حسب الحاجة
+    iframe.style.border = "1px solid #ccc";
+    iframe.loading = "eager"; // تحميل فورًا (بدل lazy)
+
+    wrapper.appendChild(titleEl);
+    wrapper.appendChild(iframe);
+    container.appendChild(wrapper);
+  });
+
+  console.log("All forms loaded as fast as possible");
+}
+
 </script>
 
 </script>
