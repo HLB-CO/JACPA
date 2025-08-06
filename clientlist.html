@@ -646,10 +646,92 @@ function linkifySmart(text) {
     localStorage.removeItem("loggedInUser");
     window.location.href = "index.html";
   }
+  <script>
+document.addEventListener('DOMContentLoaded', function () {
+  // ========== 1. تفعيل العميل عند الضغط ==========
+  const clientItems = document.querySelectorAll('.client-item');
+  clientItems.forEach(item => {
+    item.addEventListener('click', () => {
+      clientItems.forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+
+      // تأثير تمرين (اختياري): تمرير تلقائي لعرض التفاصيل
+      const detailsPanel = document.getElementById('detailsPanel');
+      if (detailsPanel) {
+        detailsPanel.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+
+  // ========== 2. فلترة العملاء عند الكتابة ==========
+  const searchInput = document.getElementById('clientSearch');
+  if (searchInput) {
+    searchInput.addEventListener('input', function () {
+      const filter = this.value.toLowerCase();
+      clientItems.forEach(item => {
+        const name = item.querySelector('.client-name').textContent.toLowerCase();
+        item.style.display = name.includes(filter) ? 'flex' : 'none';
+      });
+    });
+  }
+
+  // ========== 3. القائمة المنسدلة للدعم ==========
+  const supportBtn = document.querySelector('.header-actions button');
+  const supportDropdown = document.querySelector('.support-dropdown');
+
+  if (supportBtn && supportDropdown) {
+    supportBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      supportDropdown.style.display = supportDropdown.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // اغلاق القائمة عند الضغط خارجها
+    document.addEventListener('click', function () {
+      supportDropdown.style.display = 'none';
+    });
+
+    supportDropdown.addEventListener('click', function (e) {
+      e.stopPropagation();
+    });
+  }
+
+  // ========== 4. تحميل PDF / طباعة ==========
+  const downloadBtn = document.querySelector('.download-pdf');
+  if (downloadBtn) {
+    downloadBtn.addEventListener('click', () => {
+      window.print();
+    });
+  }
+
+  // ========== 5. تأثير الظهور عند التمرير (Intersection Observer) ==========
+  const observerOptions = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.1
+  };
+
+  const animateOnScroll = (entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = 1;
+        entry.target.style.transform = 'translateY(0)';
+        observer.unobserve(entry.target);
+      }
+    });
+  };
+
+  const observer = new IntersectionObserver(animateOnScroll, observerOptions);
+
+  document.querySelectorAll('.client-item, .response-card').forEach(el => {
+    el.style.opacity = 0;
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+  });
+});
 </script>
-
-
 </body>
 </html>
+
 
 
